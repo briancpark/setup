@@ -1,4 +1,4 @@
-sudo apt install python3 default-jre gcc valgrind neofetch htop vim git texlive-full
+sudo apt install python3 default-jre gcc valgrind neofetch htop vim git texlive-full pip3-python
 
 git clone git@github.com:briancpark/cs61a.git cs61a
 git clone git@github.com:briancpark/cs70.git cs70
