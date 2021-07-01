@@ -28,7 +28,12 @@ bash Anaconda3-2021.05-Linux-x86_64.sh
 
 export PATH="~/anaconda3/bin:$PATH"
 
+conda config --set auto_activate_base false
+
 conda create -n cs61a python=3.8
+conda create -n cs61bl python=3.9
+conda create -n cs61c python=3.6
+conda create -n cs170 python=3.8
 conda create -n cs188 python=3.6
 conda create -n cs189 python=3.8.5
 
@@ -37,4 +42,5 @@ conda env create -f data100_environment.yml
 
 cd ../cs189
 pip3 install -r requirements.txt
+
 
