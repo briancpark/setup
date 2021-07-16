@@ -9,10 +9,10 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 rm google-chrome-stable_current_amd64.deb
 
 # Git configuration
-ssh-keygen -t ed25519 -C "briancpark@berkeley.edu"
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-xclip -selection clipboard < ~/.ssh/id_ed25519.pub
+#ssh-keygen -t ed25519 -C "briancpark@berkeley.edu"
+#eval "$(ssh-agent -s)"
+#ssh-add ~/.ssh/id_ed25519
+#xclip -selection clipboard < ~/.ssh/id_ed25519.pub
 
 git config --global user.name "Brian Park"
 git config --global user.email briancpark@berkeley.edu
