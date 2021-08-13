@@ -36,6 +36,8 @@ git clone git@github.com:briancpark/cs170.git cs170/hw
 git clone git@github.com:briancpark/cs170-project.git cs170/proj
 git clone git@github.com:briancpark/cs188.git cs188
 git clone git@github.com:briancpark/cs189.git cs189
+git clone git@github.com:briancpark/cs161.git
+git clone git@github.com:briancpark/cs162.git
 
 git clone git@github.com:briancpark/vim.git
 cp vim/vimrc ./
