@@ -39,7 +39,9 @@ git clone git@github.com:briancpark/cs189.git cs189
 git clone git@github.com:briancpark/cs161-proj1.git cs161/proj1
 git clone git@github.com:cs161-students/fa21-project2-tyrellwellick.git cs161/proj2
 git clone git@github.com:briancpark/cs161-proj3.git cs161/proj3
-git clone git@github.com:briancpark/cs162.git
+git clone git@github.com:briancpark/cs162.git cs162/hw
+git clone git@github.com:briancpark/pintos.git cs162/proj
+git clone git@github.com:briancpark/cs152.git cs152
 
 git clone git@github.com:briancpark/vim.git
 cp vim/vimrc ./
@@ -54,10 +56,10 @@ export PATH="~/anaconda3/bin:$PATH"
 
 conda config --set auto_activate_base false
 
-conda create -n cs61a python=3.8
+conda create -n cs61a python=3.6
 conda create -n cs61bl python=3.9
 conda create -n cs61c python=3.6
-conda create -n cs170 python=3.8
+conda create -n cs170 python=3.9
 conda create -n cs188 python=3.6
 conda create -n cs189 python=3.8.5
 conda create -n eecs16a python=3.8
