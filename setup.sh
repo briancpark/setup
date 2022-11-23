@@ -18,30 +18,23 @@ git config --global user.name "Brian Park"
 git config --global user.email briancpark@berkeley.edu
 git config --global core.editor vim
 
-git clone git@github.com:briancpark/cs61a.git cs61a
-git clone git@github.com:Berkeley-CS61B-Student/su20-540491-g6.git cs61bl/archive
-git clone git@github.com:Berkeley-CS61B-Student/su20-p329.git cs61bl/shared
-git clone git@github.com:Berkeley-CS61B-Student/su20-s98.git cs61bl/private
-git clone git@github.com:briancpark/cs70.git cs70
-git clone git@github.com:61c-student/fa20-lab-briancpark.git cs61c/lab
-git clone git@github.com:61c-student/fa20-proj1-briancpark.git cs61c/proj1
-git clone git@github.com:61c-student/fa20-proj2-borastan.git cs61c/proj2
-git clone git@github.com:61c-student/fa20-proj3-borastan.git cs61c/proj3
-git clone git@github.com:61c-student/fa20-proj4-cython.git cs61c/proj4
-git clone git@github.com:briancpark/cs61c-toolchain.git cs61c/tools
-git clone git@github.com:briancpark/eecs16a.git eecs16a
-git clone git@github.com:briancpark/eecs16b.git eecs16b
-git clone git@github.com:briancpark/ds100.git ds100
-git clone git@github.com:briancpark/cs170.git cs170/hw
-git clone git@github.com:briancpark/cs170-project.git cs170/proj
-git clone git@github.com:briancpark/cs188.git cs188
-git clone git@github.com:briancpark/cs189.git cs189
-git clone git@github.com:briancpark/cs161-proj1.git cs161/proj1
-git clone git@github.com:cs161-students/fa21-project2-tyrellwellick.git cs161/proj2
-git clone git@github.com:briancpark/cs161-proj3.git cs161/proj3
-git clone git@github.com:briancpark/cs162.git cs162/hw
-git clone git@github.com:briancpark/pintos.git cs162/proj
+git clone --recurse git@github.com:briancpark/cs61a.git cs61a
+git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
+git clone --recurse git@github.com:briancpark/cs61c.git cs61c
+git clone --recurse git@github.com:briancpark/cs70.git cs70
+git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
+git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
+git clone --recurse git@github.com:briancpark/ds100.git ds100
+git clone --recurse git@github.com:briancpark/cs170.git cs170/hw
+git clone --recurse git@github.com:briancpark/cs170-project.git cs170/proj
+git clone --recurse git@github.com:briancpark/cs188.git cs188
+git clone --recurse git@github.com:briancpark/cs189.git cs189
+git clone --recurse git@github.com:briancpark/cs161.git cs161
+git clone --recurse git@github.com:briancpark/cs162.git cs162/hw
+git clone --recurse git@github.com:briancpark/pintos.git cs162/proj
 git clone git@github.com:briancpark/cs152.git cs152
+git clone --recurse git@github.com:briancpark/cs267.git cs267
+
 
 git clone git@github.com:briancpark/vim.git
 cp vim/vimrc ./
@@ -49,7 +42,7 @@ mv vimrc .vimrc
 rm -rf vim
 
 # Anaconda configuration
-wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
 bash Anaconda3-2021.05-Linux-x86_64.sh
 
 export PATH="~/anaconda3/bin:$PATH"
@@ -64,6 +57,8 @@ conda create -n cs188 python=3.6
 conda create -n cs189 python=3.8.5
 conda create -n eecs16a python=3.8
 conda create -n eecs16b python=3.8
+
+conda create -n nums python=3.7
 
 cd ds100
 conda env create -f data100_environment.yml
