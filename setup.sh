@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Apt installations
-sudo apt install python3 python3-pip default-jre gcc valgrind neofetch htop vim git texlive-full libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 texlive-fonts-extra xclip tmux vlc nmap snap -y
-
-# External installations
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb
-rm google-chrome-stable_current_amd64.deb
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt install python3 python3-pip default-jre gcc valgrind neofetch htop vim git texlive-full libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 texlive-fonts-extra xclip tmux vlc nmap snap -y    
+    
+    # External installations
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    sudo apt install ./google-chrome-stable_current_amd64.deb
+    rm google-chrome-stable_current_amd64.deb
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install vim git gcc valgrind neofetch htop tmux vlc nmap  
+else
+    error "Unknown OS type: $OSTYPE"
+fi
 
 # Git configuration
 #ssh-keygen -t ed25519 -C "briancpark@berkeley.edu"
@@ -15,7 +20,7 @@ rm google-chrome-stable_current_amd64.deb
 #xclip -selection clipboard < ~/.ssh/id_ed25519.pub
 
 git config --global user.name "Brian Park"
-git config --global user.email briancpark@berkeley.edu
+git config --global user.email bcpark@ncsu.edu
 git config --global core.editor vim
 
 git clone --recurse git@github.com:briancpark/cs61a.git cs61a
@@ -43,22 +48,22 @@ rm -rf vim
 
 # Anaconda configuration
 wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
-bash Anaconda3-2021.05-Linux-x86_64.sh
+bash Anaconda3*.sh
 
 export PATH="~/anaconda3/bin:$PATH"
 
 conda config --set auto_activate_base false
 
-conda create -n cs61a python=3.6
-conda create -n cs61bl python=3.9
-conda create -n cs61c python=3.6
-conda create -n cs170 python=3.9
-conda create -n cs188 python=3.6
-conda create -n cs189 python=3.8.5
-conda create -n eecs16a python=3.8
-conda create -n eecs16b python=3.8
+conda create -n cs61a python=3.6 -y
+conda create -n cs61bl python=3.9 -y
+conda create -n cs61c python=3.6 -y
+conda create -n cs170 python=3.9 -y
+conda create -n cs188 python=3.6 -y
+conda create -n cs189 python=3.8.5 -y
+conda create -n eecs16a python=3.8 -y
+conda create -n eecs16b python=3.8 -y
 
-conda create -n nums python=3.7
+conda create -n nums python=3.7 -y
 
 cd ds100
 conda env create -f data100_environment.yml
