@@ -8,21 +8,21 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt install ./google-chrome-stable_current_amd64.deb
     rm google-chrome-stable_current_amd64.deb
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    brew install vim git gcc valgrind neofetch htop tmux vlc nmap  
+    brew install vim git gcc valgrind neofetch htop tmux vlc nmap vagrant golangci-lint
 else
     error "Unknown OS type: $OSTYPE"
 fi
 
 # Git configuration
-#ssh-keygen -t ed25519 -C "briancpark@berkeley.edu"
-#eval "$(ssh-agent -s)"
-#ssh-add ~/.ssh/id_ed25519
-#xclip -selection clipboard < ~/.ssh/id_ed25519.pub
+ssh-keygen -t ed25519 -C "bcpark@ncsu.edu"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
 
 git config --global user.name "Brian Park"
 git config --global user.email bcpark@ncsu.edu
 git config --global core.editor vim
 
+# Clone UC Berkeley Repositories
 git clone --recurse git@github.com:briancpark/cs61a.git cs61a
 git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
 git clone --recurse git@github.com:briancpark/cs61c.git cs61c
@@ -30,16 +30,18 @@ git clone --recurse git@github.com:briancpark/cs70.git cs70
 git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
 git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
 git clone --recurse git@github.com:briancpark/ds100.git ds100
-git clone --recurse git@github.com:briancpark/cs170.git cs170/hw
-git clone --recurse git@github.com:briancpark/cs170-project.git cs170/proj
+git clone git@github.com:briancpark/cs152.git cs152 # TODO: Some submodules for this repo are broken
+git clone --recurse git@github.com:briancpark/cs161.git cs161
+git clone --recurse git@github.com:briancpark/cs162.git cs162
+git clone --recurse git@github.com:briancpark/cs170.git cs170
 git clone --recurse git@github.com:briancpark/cs188.git cs188
 git clone --recurse git@github.com:briancpark/cs189.git cs189
-git clone --recurse git@github.com:briancpark/cs161.git cs161
-git clone --recurse git@github.com:briancpark/cs162.git cs162/hw
-git clone --recurse git@github.com:briancpark/pintos.git cs162/proj
-git clone git@github.com:briancpark/cs152.git cs152
 git clone --recurse git@github.com:briancpark/cs267.git cs267
 
+# Clone NCSU Repositories
+git clone --recurse git@github.com:briancpark/csc512.git
+git clone --recurse git@github.com:briancpark/csc591-007.git
+git clone --recurse git@github.com:briancpark/csc791-025.git
 
 git clone git@github.com:briancpark/vim.git
 cp vim/vimrc ./
