@@ -8,7 +8,18 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt install ./google-chrome-stable_current_amd64.deb
     rm google-chrome-stable_current_amd64.deb
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    brew install vim git gcc valgrind neofetch htop tmux vlc nmap vagrant golangci-lint
+    # Install Homebrew
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Apple Silicon
+    # if [[ $(uname -m) == 'arm64' ]]; then
+        
+    # Intel
+    # elif [[ $(uname -m) == 'x86_64' ]]; then
+        
+    # fi
+
+    brew install vim git gcc valgrind neofetch htop tmux vlc nmap vagrant golangci-lint clang-format
 else
     error "Unknown OS type: $OSTYPE"
 fi
