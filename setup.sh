@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Install OS-specific packages
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt install python3 python3-pip default-jre gcc valgrind neofetch htop vim git texlive-full libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 texlive-fonts-extra xclip tmux vlc nmap snap -y    
     
@@ -7,28 +9,47 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo apt install ./google-chrome-stable_current_amd64.deb
     rm google-chrome-stable_current_amd64.deb
+
+    # Anaconda configuration
+    wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
+    
+
+    # Other installation
+    sudo snap install --classic code 
+    sudo snap install --classic heroku
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Install Homebrew
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    if ! [ -x "$(command -v brew)" ]; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"    
+    fi
+    
 
     # Apple Silicon
-    # if [[ $(uname -m) == 'arm64' ]]; then
-        
+    if [[ $(uname -m) == 'arm64' ]]; then
+        true
     # Intel
-    # elif [[ $(uname -m) == 'x86_64' ]]; then
-        
-    # fi
+    elif [[ $(uname -m) == 'x86_64' ]]; then
+        wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-MacOS\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
+    fi
 
-    brew install vim git gcc valgrind neofetch htop tmux vlc nmap vagrant golangci-lint clang-format
+    brew install vim git gcc valgrind neofetch htop tmux vlc nmap vagrant golangci-lint clang-format wget cmake
 else
     error "Unknown OS type: $OSTYPE"
 fi
 
-# Git configuration
-ssh-keygen -t ed25519 -C "bcpark@ncsu.edu"
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
 
+
+# SSH key configuration
+if ! [ -f ~/.ssh/id_ed25519.pub ]; then
+    ssh-keygen -t ed25519 -C "bcpark@ncsu.edu"
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_ed25519
+    cat ~/.ssh/id_ed25519.pub
+    echo "Please add the above SSH key to your GitHub account."
+    read response
+fi
+
+# Git configuration
 git config --global user.name "Brian Park"
 git config --global user.email bcpark@ncsu.edu
 git config --global core.editor vim
@@ -59,10 +80,10 @@ cp vim/vimrc ./
 mv vimrc .vimrc
 rm -rf vim
 
-# Anaconda configuration
-wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
-bash Anaconda3*.sh
 
+# Install Anaconda
+bash Anaconda3*.sh
+rm Anaconda3*.sh
 export PATH="~/anaconda3/bin:$PATH"
 
 conda config --set auto_activate_base false
@@ -76,6 +97,9 @@ conda create -n cs189 python=3.8.5 -y
 conda create -n eecs16a python=3.8 -y
 conda create -n eecs16b python=3.8 -y
 
+conda create -n csc591 python=3.8 -y
+conda create -n csc791 python=3.10 -y
+
 conda create -n nums python=3.7 -y
 
 cd ds100
@@ -83,6 +107,4 @@ conda env create -f data100_environment.yml
 cd ../cs189
 pip3 install -r requirements.txt
 
-# Other installation
-sudo snap install --classic code 
-sudo snap install --classic heroku
+
