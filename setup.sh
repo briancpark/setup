@@ -74,6 +74,8 @@ git clone --recurse git@github.com:briancpark/cs267.git cs267
 git clone --recurse git@github.com:briancpark/csc512.git
 git clone --recurse git@github.com:briancpark/csc591-007.git
 git clone --recurse git@github.com:briancpark/csc791-025.git
+git clone --recurse git@github.com:briancpark/csc766.git
+git clone --recurse git@github.com:briancpark/ece786.git
 
 git clone git@github.com:briancpark/vim.git
 cp vim/vimrc ./
