@@ -79,7 +79,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         golangci-lint \
         clang-format \
         wget \
-        cmake
+        cmake \
+        asitop
     
 else
     error "Unknown OS type: $OSTYPE"
