@@ -86,6 +86,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [[ $(uname -m) == 'arm64' ]]; then
         # Make sure native Homebrew for ARM is in path
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+		
+		### Install Rosetta 2 ###
+		softwareupdate --install-rosetta --agree-to-license
 	### End Apple Silicon ###
 	
     ### Intel ###
