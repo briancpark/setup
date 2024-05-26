@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ###############
 # CLI Arguments
 ###############
@@ -21,7 +20,12 @@ do
     esac
 done
 
+###############
+# Setup Script
+###############
 
+# We start and install everything in the home directory
+cd $HOME
 
 # Install OS-specific packages
 
@@ -82,11 +86,16 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [[ $(uname -m) == 'arm64' ]]; then
         # Make sure native Homebrew for ARM is in path
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-
+	### End Apple Silicon ###
+	
     ### Intel ###
+	# NOTE: This option is DEPRECATED; I don't see myself using an Intel Mac anywhere in the near future
     elif [[ $(uname -m) == 'x86_64' ]]; then
         wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-MacOS\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
     fi
+	### End Intel ###
+
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
     brew install \
         vim \
@@ -103,13 +112,11 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         clang-format \
         wget \
         cmake \
-        asitop
-    
+        asitop \
+	    mactop    
 else
     error "Unknown OS type: $OSTYPE"
 fi
-
-
 
 # SSH key configuration
 if ! [ -f ~/.ssh/id_ed25519.pub ]; then
@@ -120,7 +127,6 @@ if ! [ -f ~/.ssh/id_ed25519.pub ]; then
     echo "Please add the above SSH key to your GitHub account."
     read response
 fi
-
 
 
 ### Git Repositories ###
