@@ -1,5 +1,28 @@
 #!/bin/bash
 
+
+###############
+# CLI Arguments
+###############
+
+school=0
+
+# Check for --school option
+for arg in "$@"
+do
+    case $arg in
+        --school)
+        school=1
+        shift # Remove --school from processing
+        ;;
+        *)
+        shift # Remove generic argument from processing
+        ;;
+    esac
+done
+
+
+
 # Install OS-specific packages
 
 ### LINUX ###
@@ -105,28 +128,30 @@ git config --global user.name "Brian Park"
 git config --global user.email me@briancpark.com
 git config --global core.editor vim
 
-git clone --recurse git@github.com:briancpark/cs61a.git cs61a
-git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
-git clone --recurse git@github.com:briancpark/cs61c.git cs61c
-git clone --recurse git@github.com:briancpark/cs70.git cs70
-git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
-git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
-git clone --recurse git@github.com:briancpark/ds100.git ds100
-git clone git@github.com:briancpark/cs152.git cs152
-git clone --recurse git@github.com:briancpark/cs161.git cs161
-git clone --recurse git@github.com:briancpark/cs162.git cs162
-git clone --recurse git@github.com:briancpark/cs170.git cs170
-git clone --recurse git@github.com:briancpark/cs188.git cs188
-git clone --recurse git@github.com:briancpark/cs189.git cs189
-git clone --recurse git@github.com:briancpark/cs267.git cs267
-git clone --recurse git@github.com:briancpark/csc512.git csc512
-git clone --recurse git@github.com:briancpark/csc542.git csc542
-git clone --recurse git@github.com:briancpark/csc561.git csc561
-git clone --recurse git@github.com:briancpark/csc591-007.git csc591-007
-git clone --recurse git@github.com:briancpark/csc591-026.git csc591-026
-git clone --recurse git@github.com:briancpark/csc791-025.git csc791-025
-git clone --recurse git@github.com:briancpark/csc766.git csc766
-git clone --recurse git@github.com:briancpark/ece786.git ece786
+if [ "$school" -eq 1 ]; then
+    git clone --recurse git@github.com:briancpark/cs61a.git cs61a
+    git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
+    git clone --recurse git@github.com:briancpark/cs61c.git cs61c
+    git clone --recurse git@github.com:briancpark/cs70.git cs70
+    git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
+    git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
+    git clone --recurse git@github.com:briancpark/ds100.git ds100
+    git clone git@github.com:briancpark/cs152.git cs152
+    git clone --recurse git@github.com:briancpark/cs161.git cs161
+    git clone --recurse git@github.com:briancpark/cs162.git cs162
+    git clone --recurse git@github.com:briancpark/cs170.git cs170
+    git clone --recurse git@github.com:briancpark/cs188.git cs188
+    git clone --recurse git@github.com:briancpark/cs189.git cs189
+    git clone --recurse git@github.com:briancpark/cs267.git cs267
+    git clone --recurse git@github.com:briancpark/csc512.git csc512
+    git clone --recurse git@github.com:briancpark/csc542.git csc542
+    git clone --recurse git@github.com:briancpark/csc561.git csc561
+    git clone --recurse git@github.com:briancpark/csc591-007.git csc591-007
+    git clone --recurse git@github.com:briancpark/csc591-026.git csc591-026
+    git clone --recurse git@github.com:briancpark/csc791-025.git csc791-025
+    git clone --recurse git@github.com:briancpark/csc766.git csc766
+    git clone --recurse git@github.com:briancpark/ece786.git ece786
+fi
 
 # Install Anaconda
 bash Anaconda3*.sh
@@ -135,20 +160,22 @@ export PATH="~/anaconda3/bin:$PATH"
 
 conda config --set auto_activate_base false
 
-conda create -n cs61a python=3.6 -y
-conda create -n cs61bl python=3.9 -y
-conda create -n cs61c python=3.6 -y
-conda create -n cs170 python=3.9 -y
-conda create -n cs188 python=3.6 -y
-conda create -n cs189 python=3.8.5 -y
-conda create -n eecs16a python=3.8 -y
-conda create -n eecs16b python=3.8 -y
+if [ "$school" -eq 1 ]; then
+    conda create -n cs61a python=3.6 -y
+    conda create -n cs61bl python=3.9 -y
+    conda create -n cs61c python=3.6 -y
+    conda create -n cs170 python=3.9 -y
+    conda create -n cs188 python=3.6 -y
+    conda create -n cs189 python=3.8.5 -y
+    conda create -n eecs16a python=3.8 -y
+    conda create -n eecs16b python=3.8 -y
 
-conda create -n csc542 python=3.10 -y
-conda create -n csc591 python=3.8 -y
-conda create -n csc791 python=3.10 -y
+    conda create -n csc542 python=3.10 -y
+    conda create -n csc591 python=3.8 -y
+    conda create -n csc791 python=3.10 -y
 
-conda create -n nums python=3.7 -y
+    conda create -n nums python=3.7 -y
+fi
 
 
 ### Vim Configuration ###
