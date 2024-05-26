@@ -1,0 +1,16 @@
+call plug#begin('~/.vim/plugged')
+
+" Git Wrapper: https://github.com/tpope/vim-fugitive
+Plug 'tpope/vim-fugitive'
+
+Plug 'tpope/vim-surround'
+
+" RISC-V Syntax Highlighting: https://github.com/kylelaker/riscv.vim
+Plug 'kylelaker/riscv.vim'
+
+Plug 'terryma/vim-smooth-scroll'
+
+" GitGutter: View git changes: https://github.com/airblade/vim-gitgutter
+Plug 'airblade/vim-gitgutter'
+
+call plug#end()

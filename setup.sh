@@ -102,7 +102,7 @@ fi
 
 ### Git Repositories ###
 git config --global user.name "Brian Park"
-git config --global user.email bcpark@ncsu.edu
+git config --global user.email me@briancpark.com
 git config --global core.editor vim
 
 git clone --recurse git@github.com:briancpark/cs61a.git cs61a
@@ -112,7 +112,7 @@ git clone --recurse git@github.com:briancpark/cs70.git cs70
 git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
 git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
 git clone --recurse git@github.com:briancpark/ds100.git ds100
-git clone git@github.com:briancpark/cs152.git cs152 # TODO: Some submodules for this repo are broken
+git clone git@github.com:briancpark/cs152.git cs152
 git clone --recurse git@github.com:briancpark/cs161.git cs161
 git clone --recurse git@github.com:briancpark/cs162.git cs162
 git clone --recurse git@github.com:briancpark/cs170.git cs170
