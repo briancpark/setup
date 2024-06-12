@@ -38,8 +38,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         gcc \
         valgrind \
         neofetch \
+        mosh \
         htop \
         vim \
+		nvim \
         git \
         texlive-full \
         libgl1-mesa-glx \
@@ -102,6 +104,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
     brew install \
         vim \
+		nvim \
+        bat \
+        mosh \
         git \
         gcc \
         valgrind \
@@ -123,7 +128,7 @@ fi
 
 # SSH key configuration
 if ! [ -f ~/.ssh/id_ed25519.pub ]; then
-    ssh-keygen -t ed25519 -C "bcpark@ncsu.edu"
+    ssh-keygen -t ed25519 -C "me@briancpark.com"
     eval "$(ssh-agent -s)"
     ssh-add ~/.ssh/id_ed25519
     cat ~/.ssh/id_ed25519.pub
@@ -202,3 +207,8 @@ git clone https://github.com/github/copilot.vim \
    ~/.vim/pack/github/start/copilot.vim
 
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# TODO: Add option to install heavy setup
+# NeoVim Configuration
+git clone --depth 1 https://github.com/wbthomason/packer.nvim\
+ ~/.local/share/nvim/site/pack/packer/start/packer.nvim
