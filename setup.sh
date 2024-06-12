@@ -4,9 +4,11 @@
 # CLI Arguments
 ###############
 
+# Initialize our own variables
 school=0
+level=0
 
-# Check for --school option
+# Check for options
 for arg in "$@"
 do
     case $arg in
@@ -14,11 +16,65 @@ do
         school=1
         shift # Remove --school from processing
         ;;
+        --personal)
+        level=1
+        shift # Remove --personal from processing
+        ;;
+        --company)
+        level=2
+        shift # Remove --company from processing
+        ;;
+        --remote)
+        level=3
+        shift # Remove --remote from processing
+        ;;
+        --embedded)
+        level=4
+        shift # Remove --embedded from processing
+        ;;
         *)
         shift # Remove generic argument from processing
         ;;
     esac
 done
+
+###############
+# Functions
+###############
+
+configure_ssh_key() {
+    # SSH key configuration
+    if ! [ -f ~/.ssh/id_ed25519.pub ]; then
+        ssh-keygen -t ed25519 -C "me@briancpark.com"
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_ed25519
+        cat ~/.ssh/id_ed25519.pub
+        echo "Please add the above SSH key to your GitHub account."
+        read response
+    fi
+}
+
+vim_setup() {
+    ### Vim Configuration ###
+    git clone https://github.com/powerline/fonts
+    cd fonts
+    ./install.sh
+
+    # Vim Configuration
+    git clone git@github.com:briancpark/vim.git
+    cp vim/vimrc ./
+    mv vimrc .vimrc
+    rm -rf vim
+
+    git clone https://github.com/github/copilot.vim \
+    ~/.vim/pack/github/start/copilot.vim
+
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+    # NeoVim Configuration
+    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+}
 
 ###############
 # Setup Script
@@ -29,61 +85,41 @@ cd $HOME
 
 # Install OS-specific packages
 
-### LINUX ###
+### Linux ###
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sudo apt install \
-        python3 \
-        python3-pip \
-        default-jre \
-        gcc \
-        valgrind \
-        neofetch \
-        mosh \
-        htop \
-        vim \
-		nvim \
-        git \
-        texlive-full \
-        libgl1-mesa-glx \
-        libegl1-mesa \
-        libxrandr2 \
-        libxrandr2 \
-        libxss1 \
-        libxcursor1 \
-        libxcomposite1 \
-        libasound2 \
-        libxi6 \
-        libxtst6 \
-        texlive-fonts-extra \
-        xclip \
-        tmux \
-        vlc \
-        nmap \
-        snap \
-        -y    
+    sudo apt update
+    sudo apt install -y $(cat Aptfile)
     
+    configure_ssh_key
+
     ### External Installations ###
     # Google Chrome
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo apt install ./google-chrome-stable_current_amd64.deb
-    rm google-chrome-stable_current_amd64.deb
+    # only on personal
+    if [ "$level" -eq 1 ]; then
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
+        rm google-chrome-stable_current_amd64.deb
+
+        # Other installation
+        sudo snap install --classic code 
+        sudo snap install --classic heroku
+    fi
 
     # Anaconda 
     wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
     
-    # Other installation
-    sudo snap install --classic code 
-    sudo snap install --classic heroku
-
-### MAC OS ###
+### macOS ###
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    
+    # Install Xcode Command Line Tools
+    xcode-select --install
+
     # Install Homebrew
     touch ~/.hushlogin
     if ! [ -x "$(command -v brew)" ]; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"    
     fi
     
-
     ### Apple Silicon ###
     if [[ $(uname -m) == 'arm64' ]]; then
         # Make sure native Homebrew for ARM is in path
@@ -100,42 +136,32 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 	### End Intel ###
 
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    # TODO: Where is Apple Silicon Anaconda??
 
-    brew install \
-        vim \
-		nvim \
-        bat \
-        mosh \
-        git \
-        gcc \
-        valgrind \
-        neofetch \
-        htop \
-        tmux \
-        vlc \
-        nmap \
-        vagrant \
-        golangci-lint \
-        clang-format \
-        wget \
-        cmake \
-        asitop \
-	    mactop    
+    configure_ssh_key
+
+    # Company Laptop Setup (Assume Apple Silicon Only)
+    if [ "$level" -eq 2 ]; then
+        # Prompt me for company Git link
+        echo "Please enter the company Git link: "
+        read company_git
+        
+        if [ -n "$company_git" ]; then
+            git clone --recurse $company_git company_private_setup
+            cd company_private_setup
+            ./setup_private.sh    
+        fi    
+    fi
+
+    # Install Oh-My-Zsh
+    if [ "$level" -eq 1 ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
+
+    brew install $(cat Brewfile)
 else
     error "Unknown OS type: $OSTYPE"
 fi
-
-# SSH key configuration
-if ! [ -f ~/.ssh/id_ed25519.pub ]; then
-    ssh-keygen -t ed25519 -C "me@briancpark.com"
-    eval "$(ssh-agent -s)"
-    ssh-add ~/.ssh/id_ed25519
-    cat ~/.ssh/id_ed25519.pub
-    echo "Please add the above SSH key to your GitHub account."
-    read response
-fi
-
 
 ### Git Repositories ###
 git config --global user.name "Brian Park"
@@ -150,7 +176,7 @@ if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
     git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
     git clone --recurse git@github.com:briancpark/ds100.git ds100
-    git clone git@github.com:briancpark/cs152.git cs152
+    git clone --recurse git@github.com:briancpark/cs152.git cs152
     git clone --recurse git@github.com:briancpark/cs161.git cs161
     git clone --recurse git@github.com:briancpark/cs162.git cs162
     git clone --recurse git@github.com:briancpark/cs170.git cs170
@@ -168,7 +194,7 @@ if [ "$school" -eq 1 ]; then
 fi
 
 # Install Anaconda
-bash Anaconda3*.sh
+bash Anaconda3*.sh -b -p $HOME/anaconda3
 rm Anaconda3*.sh
 export PATH="~/anaconda3/bin:$PATH"
 
@@ -192,23 +218,5 @@ if [ "$school" -eq 1 ]; then
 fi
 
 
-### Vim Configuration ###
-git clone https://github.com/powerline/fonts
-cd fonts
-./install.sh
 
-# Vim Configuration
-git clone git@github.com:briancpark/vim.git
-cp vim/vimrc ./
-mv vimrc .vimrc
-rm -rf vim
-
-git clone https://github.com/github/copilot.vim \
-   ~/.vim/pack/github/start/copilot.vim
-
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# TODO: Add option to install heavy setup
-# NeoVim Configuration
-git clone --depth 1 https://github.com/wbthomason/packer.nvim\
- ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+vim_setup
