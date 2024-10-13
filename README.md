@@ -23,12 +23,12 @@ There are four levels of installation. Each has special configuration tailored t
 ./setup.sh --personal
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--embedded` (0) | Just the essentials needed for development on machines like Raspberry Pi and smaller. No bullshit. No bloat. Simple. |
-| `--remote` (1) | Setup for remote/shared machines, like supercomputers. Should be relatively lightweight to accomodate storage limitations. |
-| `--company` (2) | Setup for work machines. It's still lightweight, but it should include the essentials. One restriction in packages and libraries is that it MUST be MIT open source licensed. If combined with `--remote` flag, I apply blacklist |
-| `--personal` (3) | Setup for personal machine. Install all the bloat you can think of and don't care aobut  |
+| Flag         | Description |
+|--------------|-------------|
+| `--embedded` (0) | Just the essentials needed for development on machines like Raspberry Pi and smaller. No unnecessary features or bloat. Simple. |
+| `--remote` (1)   | Setup for remote/shared machines, like supercomputers. Should be relatively lightweight to accommodate storage quotas. |
+| `--company` (2)  | Setup for work machines. It's still lightweight, but it should include the essentials. One restriction in packages and libraries is that they MUST be MIT open source licensed. If combined with the `--remote` flag, a blacklist is applied. |
+| `--personal` (3) | Setup for personal machines. Install all the features and applications you can think of without worrying about storage or performance. |
 
 # TODO List
 

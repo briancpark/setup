@@ -1,28 +1,45 @@
-python3
-python3-pip
-default-jre
-gcc
-valgrind
+### MIT ###
 neofetch
+xclip
+
+### GPL ###
+xclip
+python3
+default-jre
 mosh
 htop
 vim
-nvim
 git
-libgl1-mesa-glx
-libegl1-mesa
-libxrandr2
-libxrandr2
-libxss1
-libxcursor1
-libxcomposite1
-libasound2
-libxi6
-libxtst6
-texlive-full
-texlive-fonts-extra
-xclip
-tmux
 vlc
+gcc
+valgrind
 nmap
 snap
+libasound2
+
+### GNU ###
+python3
+python3-pip
+default-jre
+mosh
+htop
+vim
+git
+tmux
+vlc
+gcc
+valgrind
+nmap
+snap
+libasound2
+
+### TEX ###
+texlive-full
+texlive-fonts-extra
+
+### ISC ###
+tmux
+
+
+### Apache ###
+nvim

@@ -38,6 +38,11 @@ do
     esac
 done
 
+if [ "$#" -eq 0 ]; then
+    echo "No arguments provided. Please provide an argument."
+    exit 1
+fi
+
 ###############
 # Functions
 ###############
@@ -110,6 +115,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     
 ### macOS ###
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # Update all macOS Software via the command line
+    softwareupdate --install -a  
     
     # Install Xcode Command Line Tools
     xcode-select --install
@@ -128,7 +135,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 		### Install Rosetta 2 ###
 		softwareupdate --install-rosetta --agree-to-license
 	### End Apple Silicon ###
-	
+
     ### Intel ###
 	# NOTE: This option is DEPRECATED; I don't see myself using an Intel Mac anywhere in the near future
     elif [[ $(uname -m) == 'x86_64' ]]; then
@@ -159,14 +166,24 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 
     brew install $(cat Brewfile)
+    
+    # XCODE RELATED THIHGS
+    ### If you're on a beta, you need to switch the path
+    # sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+
+    # lscpu for macOS
+    alias lscpu="sysctl -a"
 else
     error "Unknown OS type: $OSTYPE"
 fi
+
+# export PATH=$PATH:$HOME/go/bin
 
 ### Git Repositories ###
 git config --global user.name "Brian Park"
 git config --global user.email me@briancpark.com
 git config --global core.editor vim
+git config --global init.defaultBranch main
 
 if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/cs61a.git cs61a
