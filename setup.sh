@@ -8,6 +8,11 @@
 school=0
 level=0
 
+if [ "$#" -eq 0 ]; then
+    echo "No arguments provided. Please provide an argument."
+    exit 1
+fi
+
 # Check for options
 for arg in "$@"
 do
@@ -37,11 +42,6 @@ do
         ;;
     esac
 done
-
-if [ "$#" -eq 0 ]; then
-    echo "No arguments provided. Please provide an argument."
-    exit 1
-fi
 
 ###############
 # Functions
