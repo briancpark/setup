@@ -20,7 +20,7 @@ mactop
 mpi
 icarus-verilog
 gtkwave
-
+llvm
 
 
 #######TEST###
@@ -45,13 +45,13 @@ nmap
 tmux
 
 ### Other ###
-bat (Apache License 2.0)
-vagrant (MIT License)
-clang-format (Apache License 2.0)
-wget (GNU General Public License (GPL) version 3)
-cmake (BSD 3-Clause License)
-asitop (MIT License)
-mactop (MIT License)
-mpi (BSD 3-Clause License)
-icarus-verilog (GNU General Public License (GPL) version 2)
-gtkwave (GNU General Public License (GPL) version 2)
+bat #(Apache License 2.0)
+vagrant #(MIT License)
+clang-format #(Apache License 2.0)
+wget #(GNU General Public License (GPL) version 3)
+cmake #(BSD 3-Clause License)
+asitop #(MIT License)
+mactop #(MIT License)
+mpi #(BSD 3-Clause License)
+icarus-verilog #(GNU General Public License (GPL) version 2)
+gtkwave #(GNU General Public License (GPL) version 2)

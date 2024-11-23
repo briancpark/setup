@@ -81,6 +81,41 @@ vim_setup() {
     ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 }
 
+git_setup() {
+    ### Git Repositories ###
+    git config --global user.name "Brian Park"
+    git config --global user.email me@briancpark.com
+    git config --global core.editor vim
+    git config --global init.defaultBranch main
+}
+
+conda_setup() {
+    # Install Anaconda
+    bash Anaconda3*.sh -b -p $HOME/anaconda3
+    rm Anaconda3*.sh
+    export PATH="~/anaconda3/bin:$PATH"
+
+    conda config --set auto_activate_base false
+
+    if [ "$school" -eq 1 ]; then
+        conda create -n cs61a python=3.6 -y
+        conda create -n cs61bl python=3.9 -y
+        conda create -n cs61c python=3.6 -y
+        conda create -n cs170 python=3.9 -y
+        conda create -n cs188 python=3.6 -y
+        conda create -n cs189 python=3.8.5 -y
+        conda create -n eecs16a python=3.8 -y
+        conda create -n eecs16b python=3.8 -y
+
+        conda create -n csc542 python=3.10 -y
+        conda create -n csc591 python=3.8 -y
+        conda create -n csc791 python=3.10 -y
+
+        conda create -n nums python=3.7 -y
+    fi
+}
+
+
 ###############
 # Setup Script
 ###############
@@ -106,8 +141,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         rm google-chrome-stable_current_amd64.deb
 
         # Other installation
-        sudo snap install --classic code 
-        sudo snap install --classic heroku
+        # sudo snap install --classic code 
+        # sudo snap install --classic heroku
     fi
 
     # Anaconda 
@@ -179,11 +214,7 @@ fi
 
 # export PATH=$PATH:$HOME/go/bin
 
-### Git Repositories ###
-git config --global user.name "Brian Park"
-git config --global user.email me@briancpark.com
-git config --global core.editor vim
-git config --global init.defaultBranch main
+git_setup
 
 if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/cs61a.git cs61a
@@ -193,7 +224,7 @@ if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
     git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
     git clone --recurse git@github.com:briancpark/ds100.git ds100
-    git clone --recurse git@github.com:briancpark/cs152.git cs152
+    git clone git@github.com:briancpark/cs152.git cs152
     git clone --recurse git@github.com:briancpark/cs161.git cs161
     git clone --recurse git@github.com:briancpark/cs162.git cs162
     git clone --recurse git@github.com:briancpark/cs170.git cs170
@@ -210,30 +241,5 @@ if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/ece786.git ece786
 fi
 
-# Install Anaconda
-bash Anaconda3*.sh -b -p $HOME/anaconda3
-rm Anaconda3*.sh
-export PATH="~/anaconda3/bin:$PATH"
-
-conda config --set auto_activate_base false
-
-if [ "$school" -eq 1 ]; then
-    conda create -n cs61a python=3.6 -y
-    conda create -n cs61bl python=3.9 -y
-    conda create -n cs61c python=3.6 -y
-    conda create -n cs170 python=3.9 -y
-    conda create -n cs188 python=3.6 -y
-    conda create -n cs189 python=3.8.5 -y
-    conda create -n eecs16a python=3.8 -y
-    conda create -n eecs16b python=3.8 -y
-
-    conda create -n csc542 python=3.10 -y
-    conda create -n csc591 python=3.8 -y
-    conda create -n csc791 python=3.10 -y
-
-    conda create -n nums python=3.7 -y
-fi
-
-
-
+conda_setup
 vim_setup
