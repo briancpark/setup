@@ -87,6 +87,7 @@ git_setup() {
     git config --global user.email me@briancpark.com
     git config --global core.editor vim
     git config --global init.defaultBranch main
+    git config --global core.excludesfile ~/.gitignore_global
 }
 
 conda_setup() {
