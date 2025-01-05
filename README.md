@@ -2,14 +2,16 @@
 
 New computer setup script with my preferences. Designed to run on either macOS or Ubuntu.
 
-This is public so I can pull without setting up GitHub keys. This is not intended for public use.
+This is public so I can pull without setting up GitHub keys.
+
+***This is not intended for public use.***
 
 ## Installation
 
 One line installation:
 
 ```sh
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal
 ```
 
 ### Advanced Installation
@@ -17,10 +19,15 @@ git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh
 There are four levels of installation. Each has special configuration tailored towards a specific use case. However, they all install the essentials needed to make any shell feel like home for me.
 
 ```sh
-./setup.sh --embedded
-./setup.sh --remote
-./setup.sh --company
-./setup.sh --personal
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --embedded
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --remote
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --company
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal
+
+# or combine
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --company --remote
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal --remote
+git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal --school --remote
 ```
 
 | Flag         | Description |
@@ -32,9 +39,5 @@ There are four levels of installation. Each has special configuration tailored t
 
 # TODO List
 
-- [ ] Agnostic setup script
 - [ ] Automate oh-my-zsh setup
-- [ ] vim setup
 - [ ] tmux setup
-- [ ] Option to minimize installations (reduce bloat)
-- [ ] Company setup option that lies in private repository

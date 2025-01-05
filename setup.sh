@@ -71,8 +71,10 @@ vim_setup() {
     mv vimrc .vimrc
     rm -rf vim
 
-    git clone https://github.com/github/copilot.vim \
-    ~/.vim/pack/github/start/copilot.vim
+    if [[ "$level" != 2 ]]; then
+        git clone https://github.com/github/copilot.vim \
+        ~/.vim/pack/github/start/copilot.vim
+    fi
 
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
@@ -113,7 +115,6 @@ conda_setup() {
         conda create -n csc791 python=3.10 -y
 
         conda create -n nums python=3.7 -y
-
         conda create -n mlx python=3.11 -y
     fi
 }
@@ -134,6 +135,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt install -y $(cat Aptfile)
     
     configure_ssh_key
+
+    # TODO: We assume bash for the linux shell. Change to oh-my-zsh later
 
     ### External Installations ###
     # Google Chrome
