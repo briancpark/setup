@@ -229,6 +229,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
+    # Zinit plugin manager
+    bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)" -y
+
     brew install $(cat Brewfile)
     
     # XCODE RELATED THIHGS

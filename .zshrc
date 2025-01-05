@@ -17,3 +17,6 @@ function setup_git_config() {
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_SAVE_NO_DUPS
 export HISTIGNORE="ls:exit"
+
+
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete sudo web-search copyfile fzf)

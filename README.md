@@ -37,7 +37,31 @@ git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --person
 | `--company` (2)  | Setup for work machines. It's still lightweight, but it should include the essentials. One restriction in packages and libraries is that they MUST be MIT open source licensed. If combined with the `--remote` flag, a blacklist is applied. |
 | `--personal` (3) | Setup for personal machines. Install all the features and applications you can think of without worrying about storage or performance. |
 
-# TODO List
+## TODO List
 
 - [ ] Automate oh-my-zsh setup
 - [ ] tmux setup
+
+## Configuration
+
+I will forget what each part does; so I will document thier purposes here.
+
+### oh-my-zsh
+
+A better shell for productivity
+
+Plugins
+* Zinit plugin manager
+* git 
+* zsh-autosuggestions
+* zsh-syntax-highlighting
+* fast-syntax-highlighting
+* zsh-autocomplete
+* sudo
+* web-search
+* copyfile
+* fzf
+
+Themes
+* Powerlevel10k
+* need to install custom fonts to make icons show
