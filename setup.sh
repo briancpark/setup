@@ -113,6 +113,8 @@ conda_setup() {
         conda create -n csc791 python=3.10 -y
 
         conda create -n nums python=3.7 -y
+
+        conda create -n mlx python=3.11 -y
     fi
 }
 
@@ -149,6 +151,28 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Anaconda 
     wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
     
+    # Detect NVIDIA GPU and install NVIDIA toolkit
+    if lspci | grep -i nvidia > /dev/null; then
+        echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
+
+        # Add NVIDIA package repository
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu$(lsb_release -sr | cut -d. -f1)/x86_64/cuda-keyring_1.0-1_all.deb
+        sudo dpkg -i cuda-keyring_1.0-1_all.deb
+        sudo apt update
+
+        # Install CUDA and NVIDIA developer packages
+        sudo apt install -y cuda-toolkit-12-1 nvidia-cuda-dev nvidia-cuda-toolkit nvidia-driver-525
+
+        # Optional: Add CUDA to PATH
+        echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+        echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+        source ~/.bashrc
+
+        echo "NVIDIA toolkit and developer packages installed."
+    else
+        echo "No NVIDIA GPU detected. Skipping NVIDIA toolkit installation."
+    fi
+
 ### macOS ###
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Update all macOS Software via the command line
@@ -192,7 +216,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         if [ -n "$company_git" ]; then
             git clone --recurse $company_git company_private_setup
             cd company_private_setup
-            ./setup_private.sh    
+            ./setup_private.sh
+            cd ..  
         fi    
     fi
 
@@ -208,12 +233,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 
     # lscpu for macOS
-    alias lscpu="sysctl -a"
+    echo 'alias lscpu="sysctl -a"' >> ~/.zshrc
 else
     error "Unknown OS type: $OSTYPE"
 fi
-
-# export PATH=$PATH:$HOME/go/bin
 
 git_setup
 
@@ -225,7 +248,7 @@ if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
     git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
     git clone --recurse git@github.com:briancpark/ds100.git ds100
-    git clone git@github.com:briancpark/cs152.git cs152
+    git clone --shallow-submodules git@github.com:briancpark/cs152.git cs152
     git clone --recurse git@github.com:briancpark/cs161.git cs161
     git clone --recurse git@github.com:briancpark/cs162.git cs162
     git clone --recurse git@github.com:briancpark/cs170.git cs170
