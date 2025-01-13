@@ -16,7 +16,8 @@ valgrind
 nmap
 snap
 libasound2
-
+Makefile
+cmake
 pandoc
 
 ### GNU ###
