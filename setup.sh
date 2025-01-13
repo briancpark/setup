@@ -155,7 +155,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
     
     # Detect NVIDIA GPU and install NVIDIA toolkit
-    if lspci | grep -i nvidia > /dev/null; then
+    if command -v nvidia-smi &> /dev/null; then
         echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
 
         # Add NVIDIA package repository
@@ -247,6 +247,9 @@ fi
 git_setup
 
 if [ "$school" -eq 1 ]; then
+    mkdir -p dev
+    mkdir -p dev/school
+    cd dev/school
     git clone --recurse git@github.com:briancpark/cs61a.git cs61a
     git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
     git clone --recurse git@github.com:briancpark/cs61c.git cs61c
@@ -269,6 +272,7 @@ if [ "$school" -eq 1 ]; then
     git clone --recurse git@github.com:briancpark/csc791-025.git csc791-025
     git clone --recurse git@github.com:briancpark/csc766.git csc766
     git clone --recurse git@github.com:briancpark/ece786.git ece786
+    cd ../..
 fi
 
 conda_setup

@@ -11,7 +11,7 @@ This is public so I can pull without setting up GitHub keys.
 One line installation:
 
 ```sh
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal
 ```
 
 ### Advanced Installation
@@ -19,15 +19,15 @@ git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --person
 There are four levels of installation. Each has special configuration tailored towards a specific use case. However, they all install the essentials needed to make any shell feel like home for me.
 
 ```sh
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --embedded
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --remote
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --company
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --embedded
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --remote
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --company
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal
 
 # or combine
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --company --remote
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal --remote
-git clone git@github.com:briancpark/setup.git && cd setup && ./setup.sh --personal --school --remote
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --company --remote
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal --remote
+git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal --school --remote
 ```
 
 | Flag         | Description |
