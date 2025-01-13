@@ -143,7 +143,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # only on personal
     if [ "$level" -eq 1 ]; then
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install ./google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb -y
         rm google-chrome-stable_current_amd64.deb
 
         # Other installation
@@ -159,7 +159,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
 
         # Add NVIDIA package repository
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu$(lsb_release -sr | cut -d. -f1)/x86_64/cuda-keyring_1.0-1_all.deb
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu$(lsb_release -sr | cut -d. -f1)/x86_64/cuda-ubuntu$(lsb_release -sr | cut -d. -f1).pin
         sudo dpkg -i cuda-keyring_1.0-1_all.deb
         sudo apt update
 

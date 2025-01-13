@@ -47,6 +47,8 @@ tmux
 ### Apache ###
 nvim
 llvm
+clang
+clang-format
 
 ### BSD ###
 golang-go
