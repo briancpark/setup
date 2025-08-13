@@ -187,7 +187,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     
     # Install Oh My Zsh and Powerlevel10k
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
     sudo chsh -s $(which zsh)
     cp .zshrc "$HOME/.zshrc"
