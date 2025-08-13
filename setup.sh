@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 ###############
 # CLI Arguments
@@ -10,36 +11,37 @@ level=0
 
 if [ "$#" -eq 0 ]; then
     echo "No arguments provided. Please provide an argument."
+    echo "Examples: --personal, --company, --remote, --embedded, optionally with --school"
     exit 1
 fi
 
-# Check for options
-for arg in "$@"
-do
-    case $arg in
+# Robust option parsing
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --school)
-        school=1
-        shift # Remove --school from processing
-        ;;
+            school=1
+            shift
+            ;;
         --personal)
-        level=1
-        shift # Remove --personal from processing
-        ;;
+            level=1
+            shift
+            ;;
         --company)
-        level=2
-        shift # Remove --company from processing
-        ;;
+            level=2
+            shift
+            ;;
         --remote)
-        level=3
-        shift # Remove --remote from processing
-        ;;
+            level=3
+            shift
+            ;;
         --embedded)
-        level=4
-        shift # Remove --embedded from processing
-        ;;
+            level=4
+            shift
+            ;;
         *)
-        shift # Remove generic argument from processing
-        ;;
+            echo "Unknown option: $1 (ignored)"
+            shift
+            ;;
     esac
 done
 
@@ -60,27 +62,44 @@ configure_ssh_key() {
 }
 
 vim_setup() {
+    ### Fonts (Powerline) ###
+    if [ ! -d "$HOME/fonts" ]; then
+        git clone https://github.com/powerline/fonts "$HOME/fonts"
+    fi
+    pushd "$HOME/fonts" >/dev/null
+    if [ -x ./install.sh ]; then
+        ./install.sh
+    fi
+    popd >/dev/null
+
     ### Vim Configuration ###
-    git clone https://github.com/powerline/fonts
-    cd fonts
-    ./install.sh
+    # Use HTTPS to avoid requiring SSH keys on fresh machines
+    if [ ! -d "$HOME/vim" ]; then
+        git clone https://github.com/briancpark/vim.git "$HOME/vim"
+    fi
+    if [ -f "$HOME/vim/vimrc" ]; then
+        cp "$HOME/vim/vimrc" "$HOME/.vimrc"
+    fi
+    rm -rf "$HOME/vim"
 
-    # Vim Configuration
-    git clone git@github.com:briancpark/vim.git
-    cp vim/vimrc ./
-    mv vimrc .vimrc
-    rm -rf vim
-
+    # GitHub Copilot plugin (skip on company machines)
     if [[ "$level" != 2 ]]; then
-        git clone https://github.com/github/copilot.vim \
-        ~/.vim/pack/github/start/copilot.vim
+        if [ ! -d "$HOME/.vim/pack/github/start/copilot.vim" ]; then
+            git clone https://github.com/github/copilot.vim "$HOME/.vim/pack/github/start/copilot.vim"
+        fi
     fi
 
-    curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    # vim-plug for Vim
+    if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
+        curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    fi
 
-    # NeoVim Configuration
-    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+    # Packer for Neovim
+    if [ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]; then
+        git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+            "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim"
+    fi
 }
 
 git_setup() {
@@ -93,29 +112,56 @@ git_setup() {
 }
 
 conda_setup() {
-    # Install Anaconda
-    bash Anaconda3*.sh -b -p $HOME/anaconda3
-    rm Anaconda3*.sh
-    export PATH="~/anaconda3/bin:$PATH"
+    # Install Miniforge (Conda) appropriate to OS/arch
+    local installer=""
+    local prefix="$HOME/miniforge3"
 
-    conda config --set auto_activate_base false
+    case "$(uname -s)" in
+        Linux)
+            case "$(uname -m)" in
+                x86_64)   installer="Miniforge3-Linux-x86_64.sh" ;;
+                aarch64)  installer="Miniforge3-Linux-aarch64.sh" ;;
+                armv7l)   installer="Miniforge3-Linux-armv7l.sh" ;;
+                *)        echo "Unsupported Linux arch $(uname -m) for Miniforge" ; return ;;
+            esac
+            ;;
+        Darwin)
+            case "$(uname -m)" in
+                arm64)    installer="Miniforge3-MacOSX-arm64.sh" ;;
+                x86_64)   installer="Miniforge3-MacOSX-x86_64.sh" ;;
+                *)        echo "Unsupported macOS arch $(uname -m) for Miniforge" ; return ;;
+            esac
+            ;;
+        *) echo "Unsupported OS $(uname -s)" ; return ;;
+    esac
+
+    if [ ! -d "$prefix" ]; then
+        echo "Installing Miniforge to $prefix"
+        curl -L -o "/tmp/$installer" "https://github.com/conda-forge/miniforge/releases/latest/download/$installer"
+        bash "/tmp/$installer" -b -p "$prefix"
+    else
+        echo "Miniforge already installed at $prefix"
+    fi
+
+    # Ensure conda on PATH for this session
+    export PATH="$prefix/bin:$PATH"
+    conda config --set auto_activate_base false || true
 
     if [ "$school" -eq 1 ]; then
-        conda create -n cs61a python=3.6 -y
-        conda create -n cs61bl python=3.9 -y
-        conda create -n cs61c python=3.6 -y
-        conda create -n cs170 python=3.9 -y
-        conda create -n cs188 python=3.6 -y
-        conda create -n cs189 python=3.8.5 -y
-        conda create -n eecs16a python=3.8 -y
-        conda create -n eecs16b python=3.8 -y
-
-        conda create -n csc542 python=3.10 -y
-        conda create -n csc591 python=3.8 -y
-        conda create -n csc791 python=3.10 -y
-
-        conda create -n nums python=3.7 -y
-        conda create -n mlx python=3.11 -y
+        # Create school environments (best-effort; some very old Python versions may be unavailable)
+        conda create -n cs61a python=3.8 -y || true
+        conda create -n cs61bl python=3.9 -y || true
+        conda create -n cs61c python=3.8 -y || true
+        conda create -n cs170 python=3.9 -y || true
+        conda create -n cs188 python=3.8 -y || true
+        conda create -n cs189 python=3.8 -y || true
+        conda create -n eecs16a python=3.8 -y || true
+        conda create -n eecs16b python=3.8 -y || true
+        conda create -n csc542 python=3.10 -y || true
+        conda create -n csc591 python=3.9 -y || true
+        conda create -n csc791 python=3.10 -y || true
+        conda create -n nums python=3.8 -y || true
+        conda create -n mlx python=3.11 -y || true
     fi
 }
 
@@ -132,7 +178,12 @@ cd $HOME
 ### Linux ###
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt update
-    sudo apt install -y $(cat Aptfile)
+    if [ -f Aptfile ]; then
+        # Install packages from Aptfile (idempotent)
+        sudo xargs -a Aptfile apt install -y
+    else
+        echo "No Aptfile found. Skipping bulk apt installs."
+    fi
     
     # Install Oh My Zsh and Powerlevel10k
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -147,11 +198,11 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin
         fi
     done
-    mkdir -p ~/.local/share/fonts
-    curl -fLo "~/.local/share/fonts/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
-    curl -fLo "~/.local/share/fonts/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
-    curl -fLo "~/.local/share/fonts/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
-    curl -fLo "~/.local/share/fonts/MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+    mkdir -p "$HOME/.local/share/fonts"
+    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
     fc-cache -fv
 
     configure_ssh_key
@@ -181,27 +232,23 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # fi
     fi
 
-    # Anaconda 
-    wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-x86_64\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
-    
+    # Remove old Anaconda scraping line (deleted)
+
     # Detect NVIDIA GPU and install NVIDIA toolkit
     if command -v nvidia-smi &> /dev/null; then
         echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
-
-        # Add NVIDIA package repository
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu$(lsb_release -sr | cut -d. -f1)/x86_64/cuda-ubuntu$(lsb_release -sr | cut -d. -f1).pin
-        sudo dpkg -i cuda-keyring_1.0-1_all.deb
-        sudo apt update
-
-        # Install CUDA and NVIDIA developer packages
-        sudo apt install -y cuda-toolkit-12-1 nvidia-cuda-dev nvidia-cuda-toolkit nvidia-driver-525
-
-        # Optional: Add CUDA to PATH
-        echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
-        echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-        source ~/.bashrc
-
-        echo "NVIDIA toolkit and developer packages installed."
+        arch=$(dpkg --print-architecture)
+        ubuntu_ver=$(lsb_release -sr | cut -d. -f1)
+        tmpdeb=/tmp/cuda-keyring.deb
+        if curl -fL -o "$tmpdeb" "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${ubuntu_ver}/${arch}/cuda-keyring_1.1-1_all.deb"; then
+            sudo dpkg -i "$tmpdeb"
+            sudo apt update
+            sudo apt install -y cuda-toolkit
+            echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+            echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+        else
+            echo "Failed to download NVIDIA cuda-keyring; skipping CUDA installation."
+        fi
     else
         echo "No NVIDIA GPU detected. Skipping NVIDIA toolkit installation."
     fi
@@ -232,7 +279,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     ### Intel ###
 	# NOTE: This option is DEPRECATED; I don't see myself using an Intel Mac anywhere in the near future
     elif [[ $(uname -m) == 'x86_64' ]]; then
-        wget -O - https://www.anaconda.com/distribution/ 2>/dev/null | sed -ne 's@.*\(https:\/\/repo\.anaconda\.com\/archive\/Anaconda3-.*-Linux-MacOS\.sh\)\">64-Bit (x86) Installer.*@\1@p' | xargs wget
+        echo "Intel macOS path is deprecated; skipping Anaconda download here."
     fi
 	### End Intel ###
 
@@ -263,7 +310,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         read company_git
         
         if [ -n "$company_git" ]; then
-            git clone --recurse $company_git company_private_setup
+            git clone --recurse-submodules "$company_git" company_private_setup
             cd company_private_setup
             ./setup_private.sh
             cd ..  
@@ -282,7 +329,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # lscpu for macOS
     echo 'alias lscpu="sysctl -a"' >> ~/.zshrc
 else
-    error "Unknown OS type: $OSTYPE"
+    echo "Unknown OS type: $OSTYPE" >&2
+    exit 1
 fi
 
 git_setup
