@@ -162,13 +162,23 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Google Chrome
     # only on personal
     if [ "$level" -eq 1 ]; then
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install ./google-chrome-stable_current_amd64.deb -y
-        rm google-chrome-stable_current_amd64.deb
+        if ! command -v google-chrome &> /dev/null; then
+            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt install ./google-chrome-stable_current_amd64.deb -y
+            rm google-chrome-stable_current_amd64.deb
+        else
+            echo "Google Chrome is already installed."
+        fi
 
         # Other installation
         # sudo snap install --classic code 
+        # if ! command -v code &> /dev/null; then
+        #     sudo snap install --classic code
+        # fi
         # sudo snap install --classic heroku
+        # if ! command -v heroku &> /dev/null; then
+        #     sudo snap install --classic heroku
+        # fi
     fi
 
     # Anaconda 
