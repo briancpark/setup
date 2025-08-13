@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 ###############
 # CLI Arguments
 ###############
@@ -170,7 +172,7 @@ conda_setup() {
 # Setup Script
 ###############
 
-cp .zshrc "$HOME/.zshrc"
+cp "$REPO_DIR/.zshrc" "$HOME/.zshrc"
 
 # We start and install everything in the home directory
 cd $HOME
@@ -186,12 +188,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     else
         echo "No Aptfile found. Skipping bulk apt installs."
     fi
-    
-    # Install Oh My Zsh and Powerlevel10k
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    fi
-    sudo chsh -s $(which zsh)
 
     if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
@@ -253,6 +249,34 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         fi
     else
         echo "No NVIDIA GPU detected. Skipping NVIDIA toolkit installation."
+    fi
+
+    # Install Oh My Zsh and Powerlevel10k
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
+    sudo chsh -s $(which zsh)
+
+    # Powerlevel10k theme setup for Linux
+    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+    fi
+
+    # If repo has a preset Powerlevel10k config, install it
+    if [ -f "$REPO_DIR/.p10k.zsh" ]; then
+        cp "$REPO_DIR/.p10k.zsh" "$HOME/.p10k.zsh"
+    fi
+
+    # Ensure ZSH uses Powerlevel10k theme
+    if grep -q '^ZSH_THEME=' "$HOME/.zshrc"; then
+        sed -i 's|^ZSH_THEME=.*|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$HOME/.zshrc"
+    else
+        echo 'ZSH_THEME="powerlevel10k/powerlevel10k"' >> "$HOME/.zshrc"
+    fi
+
+    # Ensure .zshrc sources the Powerlevel10k config if present
+    if ! grep -q 'source ~/.p10k.zsh' "$HOME/.zshrc"; then
+        echo '[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh' >> "$HOME/.zshrc"
     fi
 
 ### macOS ###
