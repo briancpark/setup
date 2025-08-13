@@ -134,6 +134,26 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt update
     sudo apt install -y $(cat Aptfile)
     
+    # Install Oh My Zsh and Powerlevel10k
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    fi
+    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    fi
+    plugins=(zsh-autosuggestions zsh-syntax-highlighting)
+    for plugin in "${plugins[@]}"; do
+        if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin" ]; then
+            git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin
+        fi
+    done
+    mkdir -p ~/.local/share/fonts
+    curl -fLo "~/.local/share/fonts/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+    curl -fLo "~/.local/share/fonts/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+    curl -fLo "~/.local/share/fonts/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+    curl -fLo "~/.local/share/fonts/MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+    fc-cache -fv
+
     configure_ssh_key
 
     # TODO: We assume bash for the linux shell. Change to oh-my-zsh later
@@ -210,6 +230,22 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
     configure_ssh_key
 
+    # Install Oh My Zsh and Powerlevel10k
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    fi
+    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    fi
+    plugins=(zsh-autosuggestions zsh-syntax-highlighting)
+    for plugin in "${plugins[@]}"; do
+        if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin" ]; then
+            git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin
+        fi
+    done
+    brew tap homebrew/cask-fonts
+    brew install --cask font-meslo-lg-nerd-font
+
     # Company Laptop Setup (Assume Apple Silicon Only)
     if [ "$level" -eq 2 ]; then
         # Prompt me for company Git link
@@ -222,11 +258,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
             ./setup_private.sh
             cd ..  
         fi    
-    fi
-
-    # Install Oh-My-Zsh
-    if [ "$level" -eq 1 ]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
     # Zinit plugin manager
