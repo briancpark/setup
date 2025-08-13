@@ -189,8 +189,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     fi
-    chsh -s $(which zsh)
-    cp "$HOME/setup/.zshrc" "$HOME/.zshrc"
+    sudo chsh -s $(which zsh)
+    cp .zshrc" "$HOME/.zshrc"
 
     if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
@@ -209,8 +209,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fc-cache -fv
 
     configure_ssh_key
-
-    # TODO: We assume bash for the linux shell. Change to oh-my-zsh later
 
     ### External Installations ###
     # Google Chrome
