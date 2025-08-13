@@ -36,6 +36,7 @@ valgrind
 nmap
 snap
 libasound2
+zsh
 
 ### TEX ###
 texlive-full
