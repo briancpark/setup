@@ -1,0 +1,54 @@
+Host pintos
+  HostName 127.0.0.1
+  Port 16222
+  User workspace
+
+Host tinybox
+  HostName 192.168.1.104
+  Port 2222
+  User tinybox
+
+Host pi
+  HostName 192.168.1.189
+  Port 22
+  User pi
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+
+Host pi5
+  HostName rpi5.local
+  Port 22
+  User pi
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+
+Host ocf
+  HostName ssh.ocf.berkeley.edu
+  Port 22
+  User briancpark
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+
+Host jetson
+  HostName jetsonnano.local
+  Port 22
+  User jetsonpark
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+
+Host riscv
+  User riscv
+  HostName 172.31.1.56
+  Port 22
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+  ForwardAgent yes
+
+Host coral
+  User mendel
+  HostName zippy-ibis.local
+  Port 22
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+  ForwardAgent yes
+
