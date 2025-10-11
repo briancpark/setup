@@ -29,6 +29,7 @@ fzf
 vagrant
 asitop
 mactop
+xcbeautify
 
 ### Apache ###
 nvim

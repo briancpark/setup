@@ -161,19 +161,16 @@ function lint() {
     fi
 }
 
-alias benchmark="sudo pmset -c"
+# Source aliases
+if [ -f ~/.zsh_aliases ]; then
+    source ~/.zsh_aliases
+fi
 
-# Run on Performance Cores
-alias pcore="taskpolicy -c utility $1"
-
-# Run on Efficiency Cores
-alias ecore="taskpolicy -c background $1"
-
-# Switch between ARM and Rosetta
-alias arm="arch -arm64 zsh"
-alias rosetta="arch -x86_64 zsh"
-
-alias f="find . -name "
+# Pretty xcodebuild wrapper: keeps flags with xcodebuild only
+xcb() {
+  NSUnbufferedIO=YES xcodebuild "$@" 2>&1 | xcbeautify
+  return ${pipestatus[1]}
+}
 
 # .zsh_history
 setopt HIST_IGNORE_ALL_DUPS

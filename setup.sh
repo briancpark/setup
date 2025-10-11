@@ -173,6 +173,7 @@ conda_setup() {
 ###############
 
 cp "$REPO_DIR/.zshrc" "$HOME/.zshrc"
+cp "$REPO_DIR/.zsh_aliases" "$HOME/.zsh_aliases"
 
 # We start and install everything in the home directory
 cd $HOME
