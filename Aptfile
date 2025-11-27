@@ -1,9 +1,8 @@
-### MIT ###
+# MIT
 neofetch
 xclip
 
-### GPL ###
-xclip
+# GPL
 python3
 default-jre
 mosh
@@ -15,44 +14,29 @@ gcc
 valgrind
 nmap
 snap
-libasound2
-Makefile
+libasound2-dev
+make
 cmake
 pandoc
 
-### GNU ###
-python3
+# GNU
 python3-pip
-default-jre
 default-jdk
-mosh
-htop
-vim
-git
 tmux
-vlc
-gcc
-valgrind
-nmap
-snap
-libasound2
 zsh
 
-### TEX ###
+# TEX
 texlive-full
 texlive-fonts-extra
 
-### ISC ###
-tmux
-
-
-### Apache ###
-nvim
+# Apache
+neovim
 llvm
 clang
 clang-format
 
-### BSD ###
+# BSD
 golang-go
 
+# Other
 docker.io

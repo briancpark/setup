@@ -183,11 +183,16 @@ cd $HOME
 ### Linux ###
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt update
-    if [ -f Aptfile ]; then
-        # Install packages from Aptfile (idempotent)
-        sudo xargs -a Aptfile apt install -y
+    if [ -f "$REPO_DIR/Aptfile" ]; then
+        # Install packages from Aptfile (filter out comments and blank lines)
+        grep -v '^#' "$REPO_DIR/Aptfile" | grep -v '^$' | xargs sudo apt install -y
     else
         echo "No Aptfile found. Skipping bulk apt installs."
+    fi
+
+    # Install Oh My Zsh first (needed before plugins/themes)
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     fi
 
     if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
@@ -199,12 +204,16 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin
         fi
     done
+
+    # Download fonts only if not already present
     mkdir -p "$HOME/.local/share/fonts"
-    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
-    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
-    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
-    curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
-    fc-cache -fv
+    if [ ! -f "$HOME/.local/share/fonts/MesloLGS NF Regular.ttf" ]; then
+        curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+        curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+        curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+        curl -fL --create-dirs -o "$HOME/.local/share/fonts/MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+        fc-cache -fv
+    fi
 
     configure_ssh_key
 
@@ -235,32 +244,61 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
     # Detect NVIDIA GPU and install NVIDIA toolkit
     if command -v nvidia-smi &> /dev/null; then
-        echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
-        arch=$(dpkg --print-architecture)
-        ubuntu_ver=$(lsb_release -sr | cut -d. -f1)
-        tmpdeb=/tmp/cuda-keyring.deb
-        if curl -fL -o "$tmpdeb" "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${ubuntu_ver}/${arch}/cuda-keyring_1.1-1_all.deb"; then
-            sudo dpkg -i "$tmpdeb"
-            sudo apt update
-            sudo apt install -y cuda-toolkit
-            echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
-            echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+        # Skip if cuda-toolkit is already installed
+        if ! dpkg -l cuda-toolkit &> /dev/null; then
+            echo "NVIDIA GPU detected. Installing NVIDIA toolkit and developer packages..."
+            # Map dpkg architecture to NVIDIA's naming convention
+            dpkg_arch=$(dpkg --print-architecture)
+            case "$dpkg_arch" in
+                amd64) arch="x86_64" ;;
+                arm64) arch="sbsa" ;;
+                *) arch="$dpkg_arch" ;;
+            esac
+            # Get Ubuntu version (e.g., 22 for 22.04) - use /etc/os-release for WSL compatibility
+            if [ -f /etc/os-release ]; then
+                ubuntu_ver=$(. /etc/os-release && echo "${VERSION_ID}" | cut -d. -f1)
+            else
+                ubuntu_ver=$(lsb_release -sr | cut -d. -f1)
+            fi
+            # For WSL, use wsl-ubuntu repo if available, otherwise fallback to ubuntu repo
+            tmpdeb=/tmp/cuda-keyring.deb
+            # Try WSL-specific repo first, then fallback to standard Ubuntu repo
+            if grep -qi microsoft /proc/version 2>/dev/null; then
+                repo_name="wsl-ubuntu"
+            else
+                repo_name="ubuntu${ubuntu_ver}"
+            fi
+            if curl -fL -o "$tmpdeb" "https://developer.download.nvidia.com/compute/cuda/repos/${repo_name}/${arch}/cuda-keyring_1.1-1_all.deb"; then
+                sudo dpkg -i "$tmpdeb"
+                sudo apt update
+                sudo apt install -y cuda-toolkit
+                # Only add PATH exports if not already present
+                if ! grep -q '/usr/local/cuda/bin' ~/.bashrc 2>/dev/null; then
+                    echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+                fi
+                if ! grep -q '/usr/local/cuda/lib64' ~/.bashrc 2>/dev/null; then
+                    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+                fi
+                # Also add to zshrc for zsh users
+                if ! grep -q '/usr/local/cuda/bin' ~/.zshrc 2>/dev/null; then
+                    echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.zshrc
+                fi
+                if ! grep -q '/usr/local/cuda/lib64' ~/.zshrc 2>/dev/null; then
+                    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.zshrc
+                fi
+            else
+                echo "Failed to download NVIDIA cuda-keyring; skipping CUDA installation."
+            fi
         else
-            echo "Failed to download NVIDIA cuda-keyring; skipping CUDA installation."
+            echo "CUDA toolkit is already installed."
         fi
     else
         echo "No NVIDIA GPU detected. Skipping NVIDIA toolkit installation."
     fi
 
-    # Install Oh My Zsh and Powerlevel10k
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    fi
-    sudo chsh -s $(which zsh)
-
-    # Powerlevel10k theme setup for Linux
-    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+    # Change default shell to zsh
+    if [ "$SHELL" != "$(which zsh)" ]; then
+        sudo chsh -s "$(which zsh)" "$USER"
     fi
 
     # If repo has a preset Powerlevel10k config, install it
