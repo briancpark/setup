@@ -38,5 +38,4 @@ clang-format
 # BSD
 golang-go
 
-# Other
-docker.io
+# Note: Docker is installed via official Docker repo in setup.sh

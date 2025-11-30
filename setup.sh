@@ -113,6 +113,37 @@ git_setup() {
     git config --global core.excludesfile ~/.gitignore_global
 }
 
+docker_setup() {
+    # Install Docker using official Docker repository
+    if command -v docker &> /dev/null; then
+        echo "Docker is already installed."
+        return
+    fi
+
+    echo "Installing Docker from official repository..."
+
+    # Add Docker's official GPG key
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources
+    sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    # Add current user to docker group to run without sudo
+    sudo usermod -aG docker "$USER"
+    echo "Docker installed. You may need to log out and back in for group changes to take effect."
+}
+
 conda_setup() {
     # Install Miniforge (Conda) appropriate to OS/arch
     local installer=""
@@ -147,7 +178,10 @@ conda_setup() {
 
     # Ensure conda on PATH for this session
     export PATH="$prefix/bin:$PATH"
-    conda config --set auto_activate_base false || true
+
+    # Initialize conda for bash and zsh (adds shell hooks)
+    "$prefix/bin/conda" init bash zsh || true
+    "$prefix/bin/conda" config --set auto_activate_base false || true
 
     if [ "$school" -eq 1 ]; then
         # Create school environments (best-effort; some very old Python versions may be unavailable)
@@ -295,6 +329,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     else
         echo "No NVIDIA GPU detected. Skipping NVIDIA toolkit installation."
     fi
+
+    # Install Docker from official repo
+    docker_setup
 
     # Change default shell to zsh
     if [ "$SHELL" != "$(which zsh)" ]; then
