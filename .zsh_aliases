@@ -14,7 +14,13 @@ alias rosetta="arch -x86_64 zsh"
 
 alias f="find . -name "
 
+### J.A.R.V.I.S.
+### F.R.I.D.A.Y.
+### E.D.I.T.H.
+
 alias claude="claude --dangerously-skip-permissions"
 alias ccc="claude --dangerously-skip-permissions --continue"
 
 alias gemini="gemini --yolo"
+
+alias codex="codex --sandbox danger-full-access --ask-for-approval never"
