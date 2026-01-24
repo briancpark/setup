@@ -376,6 +376,14 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 		
 		### Install Rosetta 2 ###
 		softwareupdate --install-rosetta --agree-to-license
+
+		### Copy helper scripts (MLX tools, etc.) ###
+		if [ -d "$REPO_DIR/bin" ]; then
+			mkdir -p "$HOME/bin"
+			cp -r "$REPO_DIR/bin/"* "$HOME/bin/"
+			chmod +x "$HOME/bin/"*
+			echo "Copied helper scripts from bin/ to ~/bin/"
+		fi
 	### End Apple Silicon ###
 
     ### Intel ###
