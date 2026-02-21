@@ -384,6 +384,13 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 			chmod +x "$HOME/bin/"*
 			echo "Copied helper scripts from bin/ to ~/bin/"
 		fi
+
+		### Ghostty terminal config ###
+		if [ -f "$REPO_DIR/ghostty_config" ]; then
+			mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+			cp "$REPO_DIR/ghostty_config" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+			echo "Installed Ghostty config"
+		fi
 	### End Apple Silicon ###
 
     ### Intel ###
@@ -431,7 +438,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)" -y
 
     brew install $(cat Brewfile)
-    
+    brew install --cask ghostty
+
     # XCODE RELATED THIHGS
     ### If you're on a beta, you need to switch the path
     # sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer

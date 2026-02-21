@@ -27,3 +27,6 @@ alias codex="codex --sandbox danger-full-access --ask-for-approval never"
 
 # MLX GPU Memory Configuration (macOS ARM only)
 alias mlx-mem="$HOME/bin/mlx_memory.sh"
+
+# Repair corrupt MP4 files via ffmpeg
+alias fix-mp4="$HOME/bin/fix.sh"
