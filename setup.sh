@@ -76,13 +76,13 @@ vim_setup() {
 
     ### Vim Configuration ###
     # Use HTTPS to avoid requiring SSH keys on fresh machines
-    if [ ! -d "$HOME/vim" ]; then
+    if [ ! -f "$HOME/.vimrc" ]; then
         git clone https://github.com/briancpark/vim.git "$HOME/vim"
+        if [ -f "$HOME/vim/vimrc" ]; then
+            cp "$HOME/vim/vimrc" "$HOME/.vimrc"
+        fi
+        rm -rf "$HOME/vim"
     fi
-    if [ -f "$HOME/vim/vimrc" ]; then
-        cp "$HOME/vim/vimrc" "$HOME/.vimrc"
-    fi
-    rm -rf "$HOME/vim"
 
     # GitHub Copilot plugin (skip on company machines)
     if [[ "$level" != 2 ]]; then
@@ -358,10 +358,12 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 ### macOS ###
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Update all macOS Software via the command line
-    softwareupdate --install -a  
+    softwareupdate --install -a || true
     
     # Install Xcode Command Line Tools
-    xcode-select --install
+    if ! xcode-select -p &>/dev/null; then
+        xcode-select --install
+    fi
 
     # Install Homebrew
     touch ~/.hushlogin
@@ -372,10 +374,14 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     ### Apple Silicon ###
     if [[ $(uname -m) == 'arm64' ]]; then
         # Make sure native Homebrew for ARM is in path
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        if ! grep -q '/opt/homebrew/bin/brew shellenv' ~/.zprofile 2>/dev/null; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        fi
 		
 		### Install Rosetta 2 ###
-		softwareupdate --install-rosetta --agree-to-license
+		if ! arch -x86_64 /usr/bin/true 2>/dev/null; then
+			softwareupdate --install-rosetta --agree-to-license
+		fi
 
 		### Copy helper scripts (MLX tools, etc.) ###
 		if [ -d "$REPO_DIR/bin" ]; then
@@ -417,8 +423,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
             git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin
         fi
     done
-    brew tap homebrew/cask-fonts
-    brew install --cask font-meslo-lg-nerd-font
+    brew tap homebrew/cask-fonts 2>/dev/null || true
+    brew install --cask font-meslo-lg-nerd-font 2>/dev/null || true
 
     # Company Laptop Setup (Assume Apple Silicon Only)
     if [ "$level" -eq 2 ]; then
@@ -427,7 +433,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         read company_git
         
         if [ -n "$company_git" ]; then
-            git clone --recurse-submodules "$company_git" company_private_setup
+            if [ ! -d "company_private_setup" ]; then
+                git clone --recurse-submodules "$company_git" company_private_setup
+            fi
             cd company_private_setup
             ./setup_private.sh
             cd ..  
@@ -435,17 +443,21 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 
     # Zinit plugin manager
-    bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)" -y
+    if [ ! -d "$HOME/.local/share/zinit" ]; then
+        bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)" -y
+    fi
 
     brew install $(cat Brewfile)
-    brew install --cask ghostty
+    brew install --cask ghostty 2>/dev/null || true
 
     # XCODE RELATED THIHGS
     ### If you're on a beta, you need to switch the path
     # sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 
     # lscpu for macOS
-    echo 'alias lscpu="sysctl -a"' >> ~/.zshrc
+    if ! grep -q 'alias lscpu=' ~/.zshrc 2>/dev/null; then
+        echo 'alias lscpu="sysctl -a"' >> ~/.zshrc
+    fi
 else
     echo "Unknown OS type: $OSTYPE" >&2
     exit 1
@@ -457,28 +469,28 @@ if [ "$school" -eq 1 ]; then
     mkdir -p dev
     mkdir -p dev/school
     cd dev/school
-    git clone --recurse git@github.com:briancpark/cs61a.git cs61a
-    git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl
-    git clone --recurse git@github.com:briancpark/cs61c.git cs61c
-    git clone --recurse git@github.com:briancpark/cs70.git cs70
-    git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a
-    git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b
-    git clone --recurse git@github.com:briancpark/ds100.git ds100
-    git clone --shallow-submodules git@github.com:briancpark/cs152.git cs152
-    git clone --recurse git@github.com:briancpark/cs161.git cs161
-    git clone --recurse git@github.com:briancpark/cs162.git cs162
-    git clone --recurse git@github.com:briancpark/cs170.git cs170
-    git clone --recurse git@github.com:briancpark/cs188.git cs188
-    git clone --recurse git@github.com:briancpark/cs189.git cs189
-    git clone --recurse git@github.com:briancpark/cs267.git cs267
-    git clone --recurse git@github.com:briancpark/csc512.git csc512
-    git clone --recurse git@github.com:briancpark/csc542.git csc542
-    git clone --recurse git@github.com:briancpark/csc561.git csc561
-    git clone --recurse git@github.com:briancpark/csc591-007.git csc591-007
-    git clone --recurse git@github.com:briancpark/csc591-026.git csc591-026
-    git clone --recurse git@github.com:briancpark/csc791-025.git csc791-025
-    git clone --recurse git@github.com:briancpark/csc766.git csc766
-    git clone --recurse git@github.com:briancpark/ece786.git ece786
+    [ ! -d "cs61a" ] && git clone --recurse git@github.com:briancpark/cs61a.git cs61a || true
+    [ ! -d "cs61bl" ] && git clone --recurse git@github.com:briancpark/cs61bl.git cs61bl || true
+    [ ! -d "cs61c" ] && git clone --recurse git@github.com:briancpark/cs61c.git cs61c || true
+    [ ! -d "cs70" ] && git clone --recurse git@github.com:briancpark/cs70.git cs70 || true
+    [ ! -d "eecs16a" ] && git clone --recurse git@github.com:briancpark/eecs16a.git eecs16a || true
+    [ ! -d "eecs16b" ] && git clone --recurse git@github.com:briancpark/eecs16b.git eecs16b || true
+    [ ! -d "ds100" ] && git clone --recurse git@github.com:briancpark/ds100.git ds100 || true
+    [ ! -d "cs152" ] && git clone --shallow-submodules git@github.com:briancpark/cs152.git cs152 || true
+    [ ! -d "cs161" ] && git clone --recurse git@github.com:briancpark/cs161.git cs161 || true
+    [ ! -d "cs162" ] && git clone --recurse git@github.com:briancpark/cs162.git cs162 || true
+    [ ! -d "cs170" ] && git clone --recurse git@github.com:briancpark/cs170.git cs170 || true
+    [ ! -d "cs188" ] && git clone --recurse git@github.com:briancpark/cs188.git cs188 || true
+    [ ! -d "cs189" ] && git clone --recurse git@github.com:briancpark/cs189.git cs189 || true
+    [ ! -d "cs267" ] && git clone --recurse git@github.com:briancpark/cs267.git cs267 || true
+    [ ! -d "csc512" ] && git clone --recurse git@github.com:briancpark/csc512.git csc512 || true
+    [ ! -d "csc542" ] && git clone --recurse git@github.com:briancpark/csc542.git csc542 || true
+    [ ! -d "csc561" ] && git clone --recurse git@github.com:briancpark/csc561.git csc561 || true
+    [ ! -d "csc591-007" ] && git clone --recurse git@github.com:briancpark/csc591-007.git csc591-007 || true
+    [ ! -d "csc591-026" ] && git clone --recurse git@github.com:briancpark/csc591-026.git csc591-026 || true
+    [ ! -d "csc791-025" ] && git clone --recurse git@github.com:briancpark/csc791-025.git csc791-025 || true
+    [ ! -d "csc766" ] && git clone --recurse git@github.com:briancpark/csc766.git csc766 || true
+    [ ! -d "ece786" ] && git clone --recurse git@github.com:briancpark/ece786.git ece786 || true
     cd ../..
 fi
 
