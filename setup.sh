@@ -113,6 +113,31 @@ git_setup() {
     git config --global core.excludesfile ~/.gitignore_global
 }
 
+ssh_config_setup() {
+    # Sync SSH config from its dedicated repo. The config is symlinked (not copied) so
+    # `git pull`/`git push` in the repo keeps ~/.ssh/config in sync across machines.
+    # Requires the GitHub SSH key from configure_ssh_key to already be in place.
+    local repo_dir="$HOME/dev/ssh-config"
+
+    if [ ! -d "$repo_dir" ]; then
+        if ! git clone git@github.com:briancpark/ssh-config.git "$repo_dir"; then
+            echo "Failed to clone ssh-config repo (is the SSH key added to GitHub?); skipping."
+            return
+        fi
+    fi
+
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+
+    if [ -f "$repo_dir/config" ]; then
+        ln -sfn "$repo_dir/config" "$HOME/.ssh/config"
+        chmod 600 "$repo_dir/config"
+        echo "Linked ~/.ssh/config -> $repo_dir/config"
+    else
+        echo "No 'config' file found in $repo_dir; skipping SSH config link."
+    fi
+}
+
 docker_setup() {
     # Install Docker using official Docker repository
     if command -v docker &> /dev/null; then
@@ -464,6 +489,7 @@ else
 fi
 
 git_setup
+ssh_config_setup
 
 if [ "$school" -eq 1 ]; then
     mkdir -p dev
