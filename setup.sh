@@ -124,10 +124,14 @@ git_setup() {
 }
 
 ssh_config_setup() {
-    # Sync SSH config from its dedicated repo. The config is symlinked (not copied) so
-    # `git pull`/`git push` in the repo keeps ~/.ssh/config in sync across machines.
-    # Requires the GitHub SSH key from configure_ssh_key to already be in place.
+    # Sync SSH config from its dedicated repo. The repo's `config` is prepended to
+    # ~/.ssh/config inside a marked block, preserving any host entries already in the
+    # file. The block is delimited by markers so re-runs replace it in place rather than
+    # stacking duplicates. Requires the GitHub SSH key from configure_ssh_key.
     local repo_dir="$HOME/dev/ssh-config"
+    local target="$HOME/.ssh/config"
+    local begin="# >>> ssh-config repo (managed by setup.sh) >>>"
+    local end="# <<< ssh-config repo (managed by setup.sh) <<<"
 
     if [ ! -d "$repo_dir" ]; then
         if ! git clone git@github.com:briancpark/ssh-config.git "$repo_dir"; then
@@ -139,13 +143,36 @@ ssh_config_setup() {
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
 
-    if [ -f "$repo_dir/config" ]; then
-        ln -sfn "$repo_dir/config" "$HOME/.ssh/config"
-        chmod 600 "$repo_dir/config"
-        echo "Linked ~/.ssh/config -> $repo_dir/config"
-    else
-        echo "No 'config' file found in $repo_dir; skipping SSH config link."
+    if [ ! -f "$repo_dir/config" ]; then
+        echo "No 'config' file found in $repo_dir; skipping SSH config sync."
+        return
     fi
+
+    if [ -f "$target" ]; then
+        # Drop any previously-managed block, then prepend the fresh one above whatever
+        # host entries the user already had.
+        local remainder
+        # Delete the old managed block, then strip any leading blank lines so the
+        # spacer below doesn't accumulate across re-runs.
+        remainder="$(sed "/^${begin}$/,/^${end}$/d" "$target" | sed '/./,$!d')"
+        {
+            echo "$begin"
+            cat "$repo_dir/config"
+            echo "$end"
+            echo ""
+            printf '%s\n' "$remainder"
+        } > "${target}.tmp"
+        mv "${target}.tmp" "$target"
+        echo "Prepended ssh-config block to existing ~/.ssh/config"
+    else
+        {
+            echo "$begin"
+            cat "$repo_dir/config"
+            echo "$end"
+        } > "$target"
+        echo "Created ~/.ssh/config from $repo_dir/config"
+    fi
+    chmod 600 "$target"
 }
 
 docker_setup() {

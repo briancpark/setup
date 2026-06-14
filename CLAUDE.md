@@ -48,9 +48,11 @@ Config files in the repo root and `bin/` are the payload the script copies into 
   separate `briancpark/vim` repo — keep that in mind before editing the local copies.
 - `config` is an SSH `~/.ssh/config` (named hosts like `pi`, `tinybox`, `jetson`) kept in this
   repo for reference. The live SSH config is managed separately: `ssh_config_setup` clones
-  `git@github.com:briancpark/ssh-config.git` to `~/dev/ssh-config` and symlinks its `config`
-  to `~/.ssh/config` (symlink, so `git pull`/`git push` there keeps machines in sync). It runs
-  right after `git_setup` and depends on the GitHub SSH key from `configure_ssh_key`.
+  `git@github.com:briancpark/ssh-config.git` to `~/dev/ssh-config` and prepends its `config`
+  into `~/.ssh/config` inside a marked block (`# >>> ssh-config repo ... >>>` / `# <<< ... <<<`),
+  preserving any host entries already in the file. The markers make it idempotent — a re-run
+  replaces the block in place instead of stacking duplicates. It runs right after `git_setup`
+  and depends on the GitHub SSH key from `configure_ssh_key`.
 
 Package manifests:
 - `Aptfile` (Linux) and `Brewfile` (macOS) list packages, grouped by software license in
