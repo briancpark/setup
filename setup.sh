@@ -10,10 +10,11 @@ REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # Initialize our own variables
 school=0
 level=0
+verbose=0
 
 if [ "$#" -eq 0 ]; then
     echo "No arguments provided. Please provide an argument."
-    echo "Examples: --personal, --company, --remote, --embedded, optionally with --school"
+    echo "Examples: --personal, --company, --remote, --embedded, optionally with --school or --verbose"
     exit 1
 fi
 
@@ -22,6 +23,10 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --school)
             school=1
+            shift
+            ;;
+        --verbose)
+            verbose=1
             shift
             ;;
         --personal)
@@ -46,6 +51,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# --verbose: echo every command as it runs (native bash xtrace)
+if [ "$verbose" -eq 1 ]; then
+    set -x
+fi
 
 ###############
 # Functions
@@ -223,6 +233,99 @@ conda_setup() {
         conda create -n csc791 python=3.10 -y || true
         conda create -n nums python=3.8 -y || true
         conda create -n mlx python=3.11 -y || true
+    fi
+}
+
+ai_tools_setup() {
+    # AI coding assistants — personal machines only.
+    # Claude Code (Anthropic) and OpenAI Codex are CLIs; Google Antigravity is a GUI IDE.
+
+    ### Claude Code — official native installer, works on macOS + Linux ###
+    if ! command -v claude &> /dev/null; then
+        echo "Installing Claude Code..."
+        curl -fsSL https://claude.ai/install.sh | bash
+    else
+        echo "Claude Code is already installed."
+    fi
+
+    ### Codex + Antigravity — install method differs per OS ###
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # OpenAI Codex CLI (Homebrew cask; the homebrew/core formula is gone)
+        if ! command -v codex &> /dev/null; then
+            echo "Installing Codex..."
+            brew install --cask codex 2>/dev/null || true
+        else
+            echo "Codex is already installed."
+        fi
+
+        # Google Antigravity IDE (Homebrew cask)
+        if [ ! -d "/Applications/Antigravity.app" ]; then
+            echo "Installing Antigravity..."
+            brew install --cask antigravity-ide 2>/dev/null || true
+        else
+            echo "Antigravity is already installed."
+        fi
+
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # OpenAI Codex CLI (official curl installer)
+        if ! command -v codex &> /dev/null; then
+            echo "Installing Codex..."
+            curl -fsSL https://chatgpt.com/codex/install.sh | sh
+        else
+            echo "Codex is already installed."
+        fi
+
+        # Google Antigravity IDE — no stable scriptable URL, so best-effort scrape the
+        # current .deb link off the download page. Verify manually if this is skipped.
+        if ! command -v antigravity &> /dev/null && [ ! -d "/opt/antigravity" ]; then
+            echo "Installing Antigravity..."
+            deb_url=$(curl -fsSL https://antigravity.google/download/linux 2>/dev/null \
+                | grep -oE 'https://[^"]+\.deb' | head -n1 || true)
+            if [ -n "$deb_url" ]; then
+                tmpdeb=/tmp/antigravity.deb
+                if curl -fL -o "$tmpdeb" "$deb_url"; then
+                    sudo dpkg -i "$tmpdeb" || sudo apt-get -f install -y
+                    rm -f "$tmpdeb"
+                fi
+            else
+                echo "Could not resolve an Antigravity .deb URL automatically."
+                echo "Download it manually from https://antigravity.google/download/linux"
+            fi
+        else
+            echo "Antigravity is already installed."
+        fi
+    fi
+}
+
+tailscale_setup() {
+    # Tailscale on every machine. For a fully unattended bring-up, export an auth key
+    # before running:  TAILSCALE_AUTHKEY=tskey-auth-... ./setup.sh --personal
+    # Without it, `tailscale up` falls back to interactive browser login.
+
+    ### Install ###
+    if ! command -v tailscale &> /dev/null; then
+        echo "Installing Tailscale..."
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # CLI/daemon via the Homebrew formula (the cask 'tailscale-app' is the GUI app)
+            brew install tailscale 2>/dev/null || true
+            sudo brew services start tailscale || true
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Official installer: adds the apt repo and starts tailscaled via systemd
+            curl -fsSL https://tailscale.com/install.sh | sh
+        fi
+    else
+        echo "Tailscale is already installed."
+    fi
+
+    ### Bring the machine onto the tailnet (skip if already connected) ###
+    if command -v tailscale &> /dev/null && ! tailscale status &> /dev/null; then
+        if [ -n "${TAILSCALE_AUTHKEY:-}" ]; then
+            echo "Connecting to Tailscale with auth key..."
+            sudo tailscale up --auth-key="$TAILSCALE_AUTHKEY"
+        else
+            echo "Bringing up Tailscale (interactive browser login)..."
+            sudo tailscale up
+        fi
     fi
 }
 
@@ -522,3 +625,11 @@ fi
 
 conda_setup
 vim_setup
+
+# Tailscale — every machine
+tailscale_setup
+
+# AI coding assistants (Claude Code, Codex, Antigravity) — personal machines only
+if [ "$level" -eq 1 ]; then
+    ai_tools_setup
+fi
