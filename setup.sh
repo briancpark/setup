@@ -206,6 +206,48 @@ EOF
     echo "Docker installed. You may need to log out and back in for group changes to take effect."
 }
 
+chrome_setup() {
+    # Google Chrome (personal Linux only). Installed via Google's apt repo with a
+    # signed-by keyring so `apt upgrade` keeps it current and apt handles download/verify
+    # (no stale-.deb failures). Chrome for Linux is amd64-only — there is no official ARM
+    # build as of 2026-06 — so on arm64/armhf fall back to Chromium.
+    if command -v google-chrome &> /dev/null; then
+        echo "Google Chrome is already installed."
+        return
+    fi
+
+    local arch
+    arch="$(dpkg --print-architecture)"
+    case "$arch" in
+        amd64)
+            sudo install -m 0755 -d /etc/apt/keyrings
+            if [ ! -f /etc/apt/keyrings/google-chrome.gpg ]; then
+                curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
+                    | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+            fi
+            echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+                | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+            sudo apt update
+            sudo apt install -y google-chrome-stable
+            ;;
+        arm64|armhf)
+            echo "No official Google Chrome build for $arch Linux; installing Chromium instead."
+            if command -v chromium &> /dev/null || command -v chromium-browser &> /dev/null; then
+                echo "Chromium is already installed."
+            elif grep -qi ubuntu /etc/os-release 2>/dev/null && command -v snap &> /dev/null; then
+                # Ubuntu ships chromium as a snap (the apt package is just a shim)
+                sudo snap install chromium || true
+            else
+                # Debian / Raspberry Pi OS: native apt package is 'chromium'
+                sudo apt install -y chromium || true
+            fi
+            ;;
+        *)
+            echo "Unsupported architecture '$arch' for Chrome/Chromium; skipping."
+            ;;
+    esac
+}
+
 conda_setup() {
     # Install Miniforge (Conda) appropriate to OS/arch
     local installer=""
@@ -407,16 +449,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     configure_ssh_key
 
     ### External Installations ###
-    # Google Chrome
-    # only on personal
+    # Google Chrome (personal only); arch-aware, falls back to Chromium on ARM
     if [ "$level" -eq 1 ]; then
-        if ! command -v google-chrome &> /dev/null; then
-            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            sudo apt install ./google-chrome-stable_current_amd64.deb -y
-            rm google-chrome-stable_current_amd64.deb
-        else
-            echo "Google Chrome is already installed."
-        fi
+        chrome_setup
 
         # Other installation
         # sudo snap install --classic code 
