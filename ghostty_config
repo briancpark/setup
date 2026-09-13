@@ -48,5 +48,15 @@
 # # Just for example:
 # resize-overlay-duration = 4s 200ms
 
+background-opacity = 0.0
+background-blur = macos-glass-clear
+macos-titlebar-style = transparent
+
 theme = Vibrant Ink
+
+# tmux / SSH integration
+shell-integration-features = ssh-env,ssh-terminfo
+macos-option-as-alt = true
+clipboard-write = allow
+title-report = false
 
