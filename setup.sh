@@ -405,6 +405,7 @@ tailscale_setup() {
 
 cp "$REPO_DIR/.zshrc" "$HOME/.zshrc"
 cp "$REPO_DIR/.zsh_aliases" "$HOME/.zsh_aliases"
+cp "$REPO_DIR/.tmux.conf" "$HOME/.tmux.conf"
 
 # We start and install everything in the home directory
 cd $HOME

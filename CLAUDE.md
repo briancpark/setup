@@ -40,7 +40,7 @@ The script runs under `set -euo pipefail`, so any unguarded failure aborts the w
 
 Config files in the repo root and `bin/` are the payload the script copies into place:
 
-- `.zshrc`, `.zsh_aliases`, `.p10k.zsh` → copied to `$HOME`
+- `.zshrc`, `.zsh_aliases`, `.tmux.conf`, `.p10k.zsh` → copied to `$HOME`
 - `ghostty_config` → `~/Library/Application Support/com.mitchellh.ghostty/config` (macOS only)
 - `bin/*` → `~/bin/` (macOS Apple Silicon only), made executable
 - `.gitignore_global` → referenced via `git config core.excludesfile` (not auto-copied)
