@@ -38,10 +38,16 @@ endif
 # ---- architecture flags ----------------------------------------------------
 # -O3 -ffp-contract=fast, never -ffast-math: the FP kernels are fixed
 # dependency chains and reassociation is licensed to collapse them.
+# Prefer -mcpu=native so an M3/M4 is not built for an M1 baseline; fall back to
+# -march=native, then to the oldest Apple silicon, if the compiler rejects it.
 ARCHFLAGS := -march=native
 ifeq ($(UNAME_S),Darwin)
   ifeq ($(UNAME_M),arm64)
-    ARCHFLAGS := -mcpu=apple-m1
+    ifeq ($(shell $(CC) -mcpu=native $(SYSROOT) -x c /dev/null -fsyntax-only 2>/dev/null && echo y),y)
+      ARCHFLAGS := -mcpu=native
+    else
+      ARCHFLAGS := -mcpu=apple-m1
+    endif
   endif
 endif
 CFLAGS ?= -O3 $(ARCHFLAGS) $(SYSROOT) -ffp-contract=fast -Wall -Wextra
