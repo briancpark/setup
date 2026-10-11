@@ -1,41 +1,35 @@
-# MIT
-neofetch
-xclip
+# apt packages for every Linux profile (setup.sh strips comments; one package per line).
+# Heavier/GUI packages for --personal and --company live in Aptfile.desktop.
+#
+# Grouped by primary license; the trailing comment is the full SPDX expression from
+# upstream (matches Homebrew's metadata for the same software). See LICENSES.md.
 
-# GPL
-python3
-default-jre
-mosh
-htop
-vim
-git
-vlc
-gcc
-valgrind
-nmap
-snap
-libasound2-dev
-make
-cmake
-pandoc
+### Permissive (MIT / BSD / Apache / ISC / Vim / PSF) ###
+clang                 # Apache-2.0 WITH LLVM-exception
+clang-format          # Apache-2.0 WITH LLVM-exception
+cmake                 # BSD-3-Clause
+golang-go             # BSD-3-Clause
+llvm                  # Apache-2.0 WITH LLVM-exception
+neofetch              # MIT (unmaintained upstream; fastfetch isn't in Ubuntu 24.04)
+neovim                # Apache-2.0
+python3               # Python-2.0
+python3-pip           # MIT
+tmux                  # ISC
+vim                   # Vim
+zsh                   # MIT-Modern-Variant AND GPL-2.0-only AND GPL-2.0-or-later AND ISC
 
-# GNU
-python3-pip
-default-jdk
-tmux
-zsh
+### Copyleft with runtime/linking exception ###
+gcc                   # GPL-3.0-or-later WITH GCC-exception-3.1
 
-# TEX
-texlive-full
-texlive-fonts-extra
+### Copyleft (GPL) ###
+git                   # GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND BSD-3-Clause AND MIT
+htop                  # GPL-2.0-or-later
+make                  # GPL-3.0-or-later
+mosh                  # GPL-3.0-or-later
+valgrind              # GPL-2.0-or-later
 
-# Apache
-neovim
-llvm
-clang
-clang-format
+### Source-available / not OSI-approved ###
+nmap                  # LicenseRef-NPSL (Nmap Public Source License)
 
-# BSD
-golang-go
-
-# Note: Docker is installed via official Docker repo in setup.sh
+# Installed by setup.sh from vendor repos, not listed here: Docker, CUDA, Chrome,
+# Tailscale (see LICENSES.md).

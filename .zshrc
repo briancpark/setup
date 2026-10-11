@@ -177,4 +177,16 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_SAVE_NO_DUPS
 export HISTIGNORE="ls:exit"
 
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete sudo web-search copyfile fzf)
+# CUDA toolkit (installed by setup.sh on Linux machines with an NVIDIA GPU)
+if [[ -d /usr/local/cuda/bin ]]; then
+  export PATH=/usr/local/cuda/bin:$PATH
+  export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+fi
+
+# Miniforge (conda), installed by setup.sh; base env is not auto-activated
+if [[ -x $HOME/miniforge3/bin/conda ]]; then
+  eval "$("$HOME/miniforge3/bin/conda" shell.zsh hook)"
+fi
+
+# Powerlevel10k prompt config. To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh

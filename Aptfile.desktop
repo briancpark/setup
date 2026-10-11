@@ -1,0 +1,15 @@
+# Extra apt packages for --personal and --company only: GUI tools and big installs that
+# don't belong on remote/shared or embedded machines. Same format as Aptfile.
+
+### Copyleft with linking exception ###
+default-jdk           # GPL-2.0-only WITH Classpath-exception-2.0
+libasound2-dev        # LGPL-2.1-or-later
+
+### Copyleft (GPL) ###
+pandoc                # GPL-2.0-or-later
+snapd                 # GPL-3.0-only (Ubuntu's Chromium fallback on ARM is a snap)
+vlc                   # GPL-2.0-or-later (libVLC: LGPL-2.1-or-later)
+xclip                 # GPL-2.0-or-later
+
+### Mixed collections ###
+texlive-full          # LicenseRef-TeXLive: per-package mix (LPPL-1.3c, GPL, OFL, public domain, ...); several GB
