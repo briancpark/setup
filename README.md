@@ -1,6 +1,7 @@
 # Setup
 
-New computer setup script with my preferences. Designed to run on either macOS or Ubuntu.
+New computer setup script with my preferences. Designed to run on either macOS or
+Ubuntu/Debian.
 
 This is public so I can pull without setting up GitHub keys.
 
@@ -14,54 +15,72 @@ One line installation:
 git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal
 ```
 
-### Advanced Installation
+### Profiles
 
-There are four levels of installation. Each has special configuration tailored towards a specific use case. However, they all install the essentials needed to make any shell feel like home for me.
+Pick exactly one profile:
 
 ```sh
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --embedded
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --remote
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --company
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal
-
-# or combine
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --company --remote
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal --remote
-git clone https://github.com/briancpark/setup.git && cd setup && ./setup.sh --personal --school --remote
+./setup.sh --personal
+./setup.sh --company
+./setup.sh --remote
+./setup.sh --embedded
 ```
 
-| Flag         | Description |
-|--------------|-------------|
-| `--embedded` (0) | Just the essentials needed for development on machines like Raspberry Pi and smaller. No unnecessary features or bloat. Simple. |
-| `--remote` (1)   | Setup for remote/shared machines, like supercomputers. Should be relatively lightweight to accommodate storage quotas. |
-| `--company` (2)  | Setup for work machines. It's still lightweight, but it should include the essentials. One restriction in packages and libraries is that they MUST be MIT open source licensed. If combined with the `--remote` flag, a blacklist is applied. |
-| `--personal` (3) | Setup for personal machines. Install all the features and applications you can think of without worrying about storage or performance. |
+| Profile | Description |
+|---|---|
+| `--personal` | Personal machines. Everything: desktop packages and TeX, Docker, CUDA (if an NVIDIA GPU is present), conda, Tailscale, Chrome, Copilot, AI coding tools. |
+| `--company` | Work machines. Same as personal minus the personal proprietary extras (AI coding tools, Copilot, Chrome). On macOS also runs a private company setup repo (`COMPANY_GIT_URL`, or prompted). See [LICENSES.md](LICENSES.md). |
+| `--remote` | Remote/shared machines like supercomputers. Core packages, zsh, vim, conda. No Docker, CUDA, TeX or Tailscale. Skips anything needing `sudo` if you don't have it. |
+| `--embedded` | Minimal, e.g. Raspberry Pi. Core packages, zsh, vim, Tailscale. |
 
-## TODO List
+The full table lives at the top of `setup.sh` (the `flags=` rows).
 
-- [ ] Automate oh-my-zsh setup
-- [ ] tmux setup
+### Options
+
+| Option | Description |
+|---|---|
+| `--school` | Also clone coursework repos (over SSH, needs GitHub keys) and create their conda envs. |
+| `--update` | macOS: install pending system updates first. |
+| `--verbose` | Echo every command as it runs. |
+
+Environment variables: `TAILSCALE_AUTHKEY` for an unattended `tailscale up`, and
+`COMPANY_GIT_URL` for `--company` on macOS.
+
+The script is idempotent: re-running skips anything already installed. Best-effort steps
+that fail are listed at the end, and the script then exits non-zero.
+
+## Layout
+
+| File | Purpose |
+|---|---|
+| `setup.sh` | The only entrypoint. |
+| `Aptfile` / `Aptfile.desktop` | apt packages (core / personal+company only), grouped by license. |
+| `Brewfile` | Homebrew bundle for macOS, grouped by license. |
+| `LICENSES.md` | License inventory for everything installed. |
+| `.zshrc`, `.zsh_aliases`, `.p10k.zsh`, `.tmux.conf`, `.gitignore_global` | Copied to `$HOME` on every run. |
+| `.vimrc`, `.vimrc.plug` | Copied to `$HOME` only if not already present. |
+| `ghostty_config` | macOS Ghostty config. |
+| `bin/` | macOS helper scripts, copied to `~/bin`. |
+| `bench/` | CPU/GPU microbenchmarks (see `bench/README.md`). |
+
+SSH host config lives in the private `briancpark/ssh-config` repo and is synced into
+`~/.ssh/config` by `setup.sh`.
 
 ## Configuration
 
-I will forget what each part does; so I will document thier purposes here.
+I will forget what each part does, so I document their purposes here.
 
 ### oh-my-zsh
 
-A better shell for productivity
+A better shell for productivity.
 
-Plugins
-* Zinit plugin manager
-* git 
+Plugins (see `plugins=(...)` in `.zshrc`)
+* git, sudo, python, virtualenv, dotenv, macos
+* bundler, rake, rbenv, ruby
 * zsh-autosuggestions
 * zsh-syntax-highlighting
-* fast-syntax-highlighting
-* zsh-autocomplete
-* sudo
-* web-search
-* copyfile
-* fzf
 
 Themes
-* Powerlevel10k
-* need to install custom fonts to make icons show
+* Powerlevel10k (config in `.p10k.zsh`)
+* Needs a Nerd Font for icons: MesloLGS NF is installed on Linux, and the Meslo Nerd Font
+  cask on macOS
