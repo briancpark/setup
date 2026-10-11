@@ -30,3 +30,8 @@ alias mlx-mem="$HOME/bin/mlx_memory.sh"
 
 # Repair corrupt MP4 files via ffmpeg
 alias fix-mp4="$HOME/bin/fix.sh"
+
+# lscpu for macOS
+if [[ $OSTYPE == darwin* ]]; then
+    alias lscpu="sysctl -a"
+fi

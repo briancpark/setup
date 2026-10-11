@@ -18,8 +18,8 @@ fi
 TOTAL_MEM_MB=$(($(sysctl -n hw.memsize) / 1024 / 1024))
 
 # Calculate the memory limits
-WIRED_LIMIT_MB=$(($TOTAL_MEM_MB * $WIRED_LIMIT_PERCENT / 100))
-WIRED_LWM_MB=$(($TOTAL_MEM_MB * $WIRED_LWM_PERCENT / 100))
+WIRED_LIMIT_MB=$((TOTAL_MEM_MB * WIRED_LIMIT_PERCENT / 100))
+WIRED_LWM_MB=$((TOTAL_MEM_MB * WIRED_LWM_PERCENT / 100))
 
 # Display the calculated values
 echo "Total memory: $TOTAL_MEM_MB MB"
